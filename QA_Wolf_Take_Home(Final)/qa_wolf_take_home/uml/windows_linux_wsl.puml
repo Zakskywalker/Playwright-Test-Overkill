@@ -1,0 +1,80 @@
+@startuml
+' Windows/Linux/WSL architecture overview
+skinparam dpi 150
+left to right direction
+
+package "User / Operator" as User {
+  actor Developer
+}
+
+package "Platform Scripts" {
+  component "manage_project.bat/.ps1" as WindowsScripts
+  component "manage_project.sh" as UnixScripts
+}
+
+package "Runtime" {
+  node "Windows Host" as WinHost
+  node "Linux Host" as LinuxHost
+  node "WSL (Ubuntu)" as WSL
+}
+
+package "Application" {
+  component "Node.js Process" as Node
+  component "Logging (logging.js)" as Logger
+  component "Setup (setup.js)" as Setup
+  component "Utilities (utilities.js)" as Utils
+  component "HTML Report Generator" as HTMLGen
+  component "Tests (test/*.test.js)" as Tests
+  database "Build Output (build/YYYY-MM-DD)" as BuildOutputs
+}
+
+' Basic Relationships
+Developer --> WindowsScripts : run (double-click / cmd)
+Developer --> UnixScripts : run (bash)
+
+WindowsScripts --> Node : launches node / setup / tests
+UnixScripts --> Node : launches node / setup / tests
+
+' Platform-specific notes
+WinHost --> Node : runs Node on Windows
+LinuxHost --> Node : runs Node on Linux
+WSL --> Node : runs Node inside WSL (Linux userland)
+
+' File system
+Node --> Logger : uses
+Node --> Setup : uses
+Node --> Utils : uses
+Tests --> Node : run by node --test
+Node --> BuildOutputs : writes logs, screenshots, reports
+
+' WSL special mapping
+WSL --> BuildOutputs : /mnt/c/... maps to Windows filesystem (shared)
+WinHost --> BuildOutputs : Windows paths (C:\...) accessible to Node on Windows
+LinuxHost --> BuildOutputs : Linux native paths (/home/.../project/build)
+
+' Playwright & Browsers (Fixed syntax error from line 42)
+component "Playwright (npm)" as Playwright
+Node --> Playwright : requires & launches browsers
+Playwright --> "Browser Binaries" : chromium, firefox, webkit
+"Browser Binaries" --> BuildOutputs : screenshots saved to per-run folder
+  
+' --- HIGH LEVEL FLOWS (Re-written for Component Compatibility) ---
+
+' Windows Flow
+Developer .[#Blue].> WindowsScripts : [Windows 1] run
+WindowsScripts .[#Blue].> Node : [Windows 2] start
+Node .[#Blue].> Setup : [Windows 3] check env
+Node .[#Blue].> Tests : [Windows 4] run tests -> BuildOutputs
+
+' Linux Flow
+Developer .[#Orange].> UnixScripts : [Linux 1] run
+UnixScripts .[#Orange].> Node : [Linux 2] start
+Node .[#Orange].> Setup : [Linux 3] check env
+Node .[#Orange].> Tests : [Linux 4] run tests -> BuildOutputs
+
+' WSL Flow
+Developer .[#Green].> WSL : [WSL 1] enters WSL bash
+WSL .[#Green].> Node : [WSL 2] start inside WSL
+Node .[#Green].> Setup : [WSL 3] check env
+Node .[#Green].> Tests : [WSL 4] run tests -> BuildOutputs on /mnt/c/...
+@enduml

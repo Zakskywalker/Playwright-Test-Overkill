@@ -1,0 +1,99 @@
+@startuml
+' Detailed variable and method connection map for QA Wolf
+skinparam classAttributeIconSize 0
+
+class Config {
+  - projectRoot: string
+  - buildDir: string
+  - headless: boolean
+  - testHeadless: boolean
+  - hackerNewsNewestUrl: string
+  + getLocalDateStamp(date): string
+  + getRunId(date): string
+  + getRunPaths(date): RunPaths
+}
+
+class Logging {
+  - lines: string[]
+  + log(message)
+  + warn(message)
+  + error(message)
+  + table(data)
+  + getLines(): string[]
+  + clearLines()
+}
+
+class SetupModule {
+  + ensureBuildDir()
+  + section(title)
+  + runCommand(command, args, options)
+  + getNpmCliPath()
+  + runNpm(args, options)
+  + execNpm(args, options)
+  + getPackageVersion(packageName)
+  + getPlaywrightFromLocation(location)
+  + detectRuntime()
+  + checkNode()
+  + checkNpm()
+  + checkPlaywrightNpmVersion()
+  + checkPlaywrightBrowsers(playwright)
+  + printModal(message, options)
+  + ask(question)
+  + recoverMissingPlaywright()
+  + writeLogs()
+  + main()
+}
+
+class Data {
+  - temp: string
+  - dates: string[]
+  - titleLine: string[]
+  - links: string[]
+  + DirCreation(buildDir, ScreenCapsDir)
+  + formatRelativeTime(inputString)
+  + parseRelativeDateData(ageString)
+  + dataCollector(type, page, initial)
+  + generateTextTable(array)
+}
+
+class Camera {
+  - ScreenCapsDir: string
+  - photoSnaps: number
+  + snap(page)
+}
+
+class TableModel {
+  - tableData: any[]
+  - rows: number
+  - cols: number
+  + push(table, dat)
+}
+
+class Terminal {
+  - data: Data
+  + cOut(txt)
+  + dSpace()
+  + tabGen(data)
+  + script(choice, vars)
+}
+
+class HtmlReportGenerator {
+  - outputPath: string
+  + constructor(outputPath)
+  + parseCleanDate(dateStr)
+  + escapeHtml(value)
+  + writeReport(dataArray, linksArray)
+}
+
+Config "1" --> "*" Data : provides paths/dateStamp
+Config --> Camera : passes screenshotsDir
+Config --> HtmlReportGenerator : provides report path
+Logging <.. Terminal : uses
+Logging <.. SetupModule : uses
+Logging <.. HtmlReportGenerator : uses
+SetupModule --> Logging : writes setup output
+Data --> Logging : logs warnings and table output
+Camera --> Logging : warns on closed pages
+HtmlReportGenerator --> Data : consumes table rows and links
+Terminal --> Data : optionally uses data for report generation
+@enduml

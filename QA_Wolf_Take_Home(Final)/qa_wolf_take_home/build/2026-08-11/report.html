@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Progressive Dashboard Report</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    nav {
+      width: 260px;
+      background-color: #1e1e1e;
+      border-right: 1px solid #333;
+      padding: 20px;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    nav h2 {
+      font-size: 1.1rem;
+      margin-top: 0;
+      color: #fff;
+      border-bottom: 1px solid #333;
+      padding-bottom: 10px;
+    }
+    .test-item {
+      padding: 12px 10px;
+      margin-bottom: 6px;
+      background-color: #2a2a2a;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.2s, border-left 0.1s;
+      font-size: 0.9rem;
+      font-family: monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-left: 3px solid transparent;
+    }
+    .test-item:hover, .test-item.active {
+      background-color: #383838;
+    }
+    .test-item.active {
+      border-left-color: #64b5f6;
+      color: #fff;
+      background-color: #3f3f3f;
+    }
+    .viewport-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      min-width: 0;
+    }
+    .sticky-header-panel {
+      background-color: #1a1a1a;
+      border-bottom: 1px solid #333;
+      padding: 20px 30px;
+      z-index: 10;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    .sticky-header-panel h1 {
+      margin: 0 0 15px 0;
+      font-size: 1.5rem;
+      color: #fff;
+    }
+    .chart-wrapper {
+      background-color: #111;
+      border: 1px solid #2d2d2d;
+      border-radius: 6px;
+      padding: 15px 10px 5px 10px;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    .chart-wrapper svg {
+      display: block;
+      min-width: 100%;
+    }
+    .chart-node {
+      cursor: pointer;
+    }
+    .chart-node circle {
+      transition: r 0.2s, stroke 0.2s;
+    }
+    .chart-node:hover circle, .chart-node.active circle {
+      r: 15px;
+      stroke: #64b5f6;
+    }
+    .chart-label {
+      font-size: 9px;
+      fill: #fff;
+      font-weight: 700;
+      font-family: monospace;
+      pointer-events: none;
+    }
+    .chart-time {
+      font-size: 9px;
+      fill: #999;
+      font-family: monospace;
+      pointer-events: none;
+    }
+    .chart-tick {
+      stroke: #555;
+      stroke-width: 2;
+      pointer-events: none;
+    }
+    .scrollable-table-area {
+      flex: 1;
+      padding: 30px;
+      overflow: auto;
+      scroll-behavior: smooth;
+      box-sizing: border-box;
+    }
+    .table-container {
+      width: 100%;
+      background-color: #1e1e1e;
+      border-radius: 6px;
+      border: 1px solid #333;
+      overflow: auto;
+      margin-bottom: 40px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #333;
+      font-size: 0.9rem;
+      vertical-align: top;
+    }
+    th {
+      background-color: #252525;
+      color: #fff;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    tr {
+      transition: background-color 0.2s;
+    }
+    tr:hover {
+      background-color: #252525;
+    }
+    tr.highlighted-row {
+      background-color: #1c2d42 !important;
+      outline: 1px solid #64b5f6;
+    }
+    .title-cell {
+      max-width: 420px;
+      word-break: break-word;
+    }
+    .status-pass { color: #4caf50; font-weight: bold; }
+    .status-fail { color: #f44336; font-weight: bold; }
+    .row-link { color: #64b5f6; text-decoration: none; }
+    .row-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <nav>
+    <h2>Navigation Index</h2>
+    <div class="test-item" id="nav-item-row-1-Apple_" onclick="scrollToRow('row-1-Apple_')" title="(1) Apple Executive in Charge of Pay and Wallet Services Is Leaving (yahoo.com)">(1) Apple Executive in Charge of Pay and Wallet Services Is Leaving (yahoo.com)</div>
+<div class="test-item" id="nav-item-row-2-Appeti" onclick="scrollToRow('row-2-Appeti')" title="(2) Appetite-suppressing hormone may protect liver from inflammation (medicalxpress.com)">(2) Appetite-suppressing hormone may protect liver from inflammation (medicalxpress.com)</div>
+<div class="test-item" id="nav-item-row-3-FieldF" onclick="scrollToRow('row-3-FieldF')" title="(3) FieldFleet – self-hostable field operations built with Flutter and Supabase (taskfleetai.github.io)">(3) FieldFleet – self-hostable field operations built with Flutter and Supabase (taskfleetai.github.io)</div>
+<div class="test-item" id="nav-item-row-4-When_s" onclick="scrollToRow('row-4-When_s')" title="(4) When&#39;s the next model coming out? (modelrumor.com)">(4) When&#39;s the next model coming out? (modelrumor.com)</div>
+<div class="test-item" id="nav-item-row-5-URLs_a" onclick="scrollToRow('row-5-URLs_a')" title="(5) URLs aren&#39;t strings, and my recent encounter with this (utcc.utoronto.ca)">(5) URLs aren&#39;t strings, and my recent encounter with this (utcc.utoronto.ca)</div>
+<div class="test-item" id="nav-item-row-6-Nobody" onclick="scrollToRow('row-6-Nobody')" title="(6) Nobody is going to tell you your website is bad (cooked-phi-pink.vercel.app)">(6) Nobody is going to tell you your website is bad (cooked-phi-pink.vercel.app)</div>
+<div class="test-item" id="nav-item-row-7-What_s" onclick="scrollToRow('row-7-What_s')" title="(7) What&#39;s the most memory-efficient way to check the weather forecast? (manualdousuario.net)">(7) What&#39;s the most memory-efficient way to check the weather forecast? (manualdousuario.net)</div>
+<div class="test-item" id="nav-item-row-8-Show_H" onclick="scrollToRow('row-8-Show_H')" title="(8) Show HN: NotebookLM Calibre Plugin (github.com/divyenduz)">(8) Show HN: NotebookLM Calibre Plugin (github.com/divyenduz)</div>
+<div class="test-item" id="nav-item-row-9-Declar" onclick="scrollToRow('row-9-Declar')" title="(9) Declarative Canvas UI for the browser, inspired by Swift (romanuk.org)">(9) Declarative Canvas UI for the browser, inspired by Swift (romanuk.org)</div>
+<div class="test-item" id="nav-item-row-10-Vitami" onclick="scrollToRow('row-10-Vitami')" title="(10) Vitamin D regulates &gt;5% of the human genome (empirical.health)">(10) Vitamin D regulates &gt;5% of the human genome (empirical.health)</div>
+<div class="test-item" id="nav-item-row-11-Three_" onclick="scrollToRow('row-11-Three_')" title="(11) Three hour notice: congressional report incoming">(11) Three hour notice: congressional report incoming</div>
+<div class="test-item" id="nav-item-row-12-Unslot" onclick="scrollToRow('row-12-Unslot')" title="(12) Unsloth Desktop: Open-Source App for Local Models (github.com/unslothai)">(12) Unsloth Desktop: Open-Source App for Local Models (github.com/unslothai)</div>
+<div class="test-item" id="nav-item-row-13-FreeHo" onclick="scrollToRow('row-13-FreeHo')" title="(13) FreeHosts – A community-curated directory of free hosting providers (freehosts.eu)">(13) FreeHosts – A community-curated directory of free hosting providers (freehosts.eu)</div>
+<div class="test-item" id="nav-item-row-14-The_Gr" onclick="scrollToRow('row-14-The_Gr')" title="(14) The Great Copper Crunch: Why the Next Bull Run Is Just Getting Started (prinsights.substack.com)">(14) The Great Copper Crunch: Why the Next Bull Run Is Just Getting Started (prinsights.substack.com)</div>
+<div class="test-item" id="nav-item-row-15-P____A" onclick="scrollToRow('row-15-P____A')" title="(15) P/ – A simple and clear programming language">(15) P/ – A simple and clear programming language</div>
+<div class="test-item" id="nav-item-row-16-Ask_HN" onclick="scrollToRow('row-16-Ask_HN')" title="(16) Ask HN: How much Adderall do you use?">(16) Ask HN: How much Adderall do you use?</div>
+<div class="test-item" id="nav-item-row-17-Unders" onclick="scrollToRow('row-17-Unders')" title="(17) Understanding an AI agent&#39;s memory through Harry Potter (squidler.io)">(17) Understanding an AI agent&#39;s memory through Harry Potter (squidler.io)</div>
+<div class="test-item" id="nav-item-row-18-My_hom" onclick="scrollToRow('row-18-My_hom')" title="(18) My home internet died for half a day. So did every agent I had (bostrat.ai)">(18) My home internet died for half a day. So did every agent I had (bostrat.ai)</div>
+<div class="test-item" id="nav-item-row-19-Fedora" onclick="scrollToRow('row-19-Fedora')" title="(19) Fedora CoreOS to Enable Systemd-Oomd and ZRAM Swap by Default (phoronix.com)">(19) Fedora CoreOS to Enable Systemd-Oomd and ZRAM Swap by Default (phoronix.com)</div>
+<div class="test-item" id="nav-item-row-20-Ask_HN" onclick="scrollToRow('row-20-Ask_HN')" title="(20) Ask HN: When should you open-source your solution and why?">(20) Ask HN: When should you open-source your solution and why?</div>
+<div class="test-item" id="nav-item-row-21-TDD_in" onclick="scrollToRow('row-21-TDD_in')" title="(21) TDD inside the agent loop – theater or actual value? (martinfowler.com)">(21) TDD inside the agent loop – theater or actual value? (martinfowler.com)</div>
+<div class="test-item" id="nav-item-row-22-Show_H" onclick="scrollToRow('row-22-Show_H')" title="(22) Show HN: HyperSAE – Hyperbolic Sparse Autoencoders for LLM Interpretability (github.com/vishal-dehurdle)">(22) Show HN: HyperSAE – Hyperbolic Sparse Autoencoders for LLM Interpretability (github.com/vishal-dehurdle)</div>
+<div class="test-item" id="nav-item-row-23-LTX_2_" onclick="scrollToRow('row-23-LTX_2_')" title="(23) LTX 2.5 a stronger foundation for what&#39;s being built (ltx.io)">(23) LTX 2.5 a stronger foundation for what&#39;s being built (ltx.io)</div>
+<div class="test-item" id="nav-item-row-24-Ask_HN" onclick="scrollToRow('row-24-Ask_HN')" title="(24) Ask HN: How do you keep 54 LLM workflows on the right models?">(24) Ask HN: How do you keep 54 LLM workflows on the right models?</div>
+<div class="test-item" id="nav-item-row-25-OpenAI" onclick="scrollToRow('row-25-OpenAI')" title="(25) OpenAI&#39;s head of ethics leaves startup less than one year after joining (ft.com)">(25) OpenAI&#39;s head of ethics leaves startup less than one year after joining (ft.com)</div>
+<div class="test-item" id="nav-item-row-26-A_Prel" onclick="scrollToRow('row-26-A_Prel')" title="(26) A Preliminary Study on Simultaneous Coscheduling for Discrete GPU vs. Fused GPU (arxiv.org)">(26) A Preliminary Study on Simultaneous Coscheduling for Discrete GPU vs. Fused GPU (arxiv.org)</div>
+<div class="test-item" id="nav-item-row-27-Show_H" onclick="scrollToRow('row-27-Show_H')" title="(27) Show HN: SmokeOps – describe a flow, get checks you rerun without AI (github.com/gate3)">(27) Show HN: SmokeOps – describe a flow, get checks you rerun without AI (github.com/gate3)</div>
+<div class="test-item" id="nav-item-row-28-Imprin" onclick="scrollToRow('row-28-Imprin')" title="(28) Imprint – Fine-tune MoE LLMs bigger than your RAM (github.com/sigma0101111)">(28) Imprint – Fine-tune MoE LLMs bigger than your RAM (github.com/sigma0101111)</div>
+<div class="test-item" id="nav-item-row-29-Sam_s_" onclick="scrollToRow('row-29-Sam_s_')" title="(29) Sam&#39;s News – Free AI News Aggregator (samnews.news)">(29) Sam&#39;s News – Free AI News Aggregator (samnews.news)</div>
+<div class="test-item" id="nav-item-row-30-We_Use" onclick="scrollToRow('row-30-We_Use')" title="(30) We Used to Get Jobs (ironicsans.ghost.io)">(30) We Used to Get Jobs (ironicsans.ghost.io)</div>
+<div class="test-item" id="nav-item-row-31-Nvidia" onclick="scrollToRow('row-31-Nvidia')" title="(31) Nvidia building 1T-parameter Nemotron 4 to rival open AI models (reuters.com)">(31) Nvidia building 1T-parameter Nemotron 4 to rival open AI models (reuters.com)</div>
+<div class="test-item" id="nav-item-row-32-Cynthi" onclick="scrollToRow('row-32-Cynthi')" title="(32) Cynthion: Open-source USB test instrument (greatscottgadgets.com)">(32) Cynthion: Open-source USB test instrument (greatscottgadgets.com)</div>
+<div class="test-item" id="nav-item-row-33-Elon_M" onclick="scrollToRow('row-33-Elon_M')" title="(33) Elon Musk ran a decoy super PAC to compare Trump with RGB (google.com)">(33) Elon Musk ran a decoy super PAC to compare Trump with RGB (google.com)</div>
+<div class="test-item" id="nav-item-row-34-The_wo" onclick="scrollToRow('row-34-The_wo')" title="(34) The worst part of using multiple LLM providers is not the API differences (github.com/maximhq)">(34) The worst part of using multiple LLM providers is not the API differences (github.com/maximhq)</div>
+<div class="test-item" id="nav-item-row-35-A_bug_" onclick="scrollToRow('row-35-A_bug_')" title="(35) A bug becoming a feature (1972 edition) (aresluna.org)">(35) A bug becoming a feature (1972 edition) (aresluna.org)</div>
+<div class="test-item" id="nav-item-row-36-Ethica" onclick="scrollToRow('row-36-Ethica')" title="(36) Ethical Cold Outreach (val.town)">(36) Ethical Cold Outreach (val.town)</div>
+<div class="test-item" id="nav-item-row-37-Report" onclick="scrollToRow('row-37-Report')" title="(37) Report from the Security Mines (val.town)">(37) Report from the Security Mines (val.town)</div>
+<div class="test-item" id="nav-item-row-38-Docfoo" onclick="scrollToRow('row-38-Docfoo')" title="(38) Docfooding: Eating Our Own Documentation (val.town)">(38) Docfooding: Eating Our Own Documentation (val.town)</div>
+<div class="test-item" id="nav-item-row-39-Hack_s" onclick="scrollToRow('row-39-Hack_s')" title="(39) Hack&#39;s Law (wikipedia.org)">(39) Hack&#39;s Law (wikipedia.org)</div>
+<div class="test-item" id="nav-item-row-40-Would_" onclick="scrollToRow('row-40-Would_')" title="(40) Would Appreciate Any Feedback (deskfellow.app)">(40) Would Appreciate Any Feedback (deskfellow.app)</div>
+<div class="test-item" id="nav-item-row-41-ChatGP" onclick="scrollToRow('row-41-ChatGP')" title="(41) ChatGPT Desktop App for Linux (twitter.com/openai)">(41) ChatGPT Desktop App for Linux (twitter.com/openai)</div>
+<div class="test-item" id="nav-item-row-42-Why_Ar" onclick="scrollToRow('row-42-Why_Ar')" title="(42) Why Are Rivers So Mathematical? (quantamagazine.org)">(42) Why Are Rivers So Mathematical? (quantamagazine.org)</div>
+<div class="test-item" id="nav-item-row-43-_2_1__" onclick="scrollToRow('row-43-_2_1__')" title="(43) (2,1)-C1P is NP-complete (zenodo.org)">(43) (2,1)-C1P is NP-complete (zenodo.org)</div>
+<div class="test-item" id="nav-item-row-44-Inacce" onclick="scrollToRow('row-44-Inacce')" title="(44) Inaccessible .bnnsir files on macOS Sequoia (lapcatsoftware.com)">(44) Inaccessible .bnnsir files on macOS Sequoia (lapcatsoftware.com)</div>
+<div class="test-item" id="nav-item-row-45-How_to" onclick="scrollToRow('row-45-How_to')" title="(45) How to Appreciate (how-to-appreciate.pages.dev)">(45) How to Appreciate (how-to-appreciate.pages.dev)</div>
+<div class="test-item" id="nav-item-row-46-Hetzne" onclick="scrollToRow('row-46-Hetzne')" title="(46) Hetzner: Open Weights Inference API (hetzner.com)">(46) Hetzner: Open Weights Inference API (hetzner.com)</div>
+<div class="test-item" id="nav-item-row-47-Flight" onclick="scrollToRow('row-47-Flight')" title="(47) FlightAware sues Kalshi over flight cancellation prediction markets [pdf] (courtlistener.com)">(47) FlightAware sues Kalshi over flight cancellation prediction markets [pdf] (courtlistener.com)</div>
+<div class="test-item" id="nav-item-row-48-Shrink" onclick="scrollToRow('row-48-Shrink')" title="(48) Shrinking student populations cause spike in public school closures across U.S. (washingtonpost.com)">(48) Shrinking student populations cause spike in public school closures across U.S. (washingtonpost.com)</div>
+<div class="test-item" id="nav-item-row-49-Termin" onclick="scrollToRow('row-49-Termin')" title="(49) TerminalWidget for Mac, iPhone, and iPad (terminalwidget.app)">(49) TerminalWidget for Mac, iPhone, and iPad (terminalwidget.app)</div>
+<div class="test-item" id="nav-item-row-50-Facebo" onclick="scrollToRow('row-50-Facebo')" title="(50) Faceboard: A Case Study in Community-Led Information Exchange (Satire) (mcsweeneys.net)">(50) Faceboard: A Case Study in Community-Led Information Exchange (Satire) (mcsweeneys.net)</div>
+<div class="test-item" id="nav-item-row-51-Provin" onclick="scrollToRow('row-51-Provin')" title="(51) Proving Muse Glimmer in Zero-Knowledge at 85 Tok/S on an H100 (attestable.com)">(51) Proving Muse Glimmer in Zero-Knowledge at 85 Tok/S on an H100 (attestable.com)</div>
+<div class="test-item" id="nav-item-row-52-Ask_HN" onclick="scrollToRow('row-52-Ask_HN')" title="(52) Ask HN: Any good alternatives to Claude that are just not Claude?">(52) Ask HN: Any good alternatives to Claude that are just not Claude?</div>
+<div class="test-item" id="nav-item-row-53-Show_H" onclick="scrollToRow('row-53-Show_H')" title="(53) Show HN: PR Nutrition, a local rule-based CLI for pull request triage (github.com/param-10)">(53) Show HN: PR Nutrition, a local rule-based CLI for pull request triage (github.com/param-10)</div>
+<div class="test-item" id="nav-item-row-54-Show_H" onclick="scrollToRow('row-54-Show_H')" title="(54) Show HN: TermDOM – HTML, CSS and JavaScript (With a Real DOM) for TUIs and CLIs (github.com/bikeshaving)">(54) Show HN: TermDOM – HTML, CSS and JavaScript (With a Real DOM) for TUIs and CLIs (github.com/bikeshaving)</div>
+<div class="test-item" id="nav-item-row-55-Termin" onclick="scrollToRow('row-55-Termin')" title="(55) Terminal-Bench 3.0 (frontierbench.ai)">(55) Terminal-Bench 3.0 (frontierbench.ai)</div>
+<div class="test-item" id="nav-item-row-56-Statel" onclick="scrollToRow('row-56-Statel')" title="(56) Stateless Servers, Stateful Payloads: Sessions vs. Continuations, Rust (dmitrii.app)">(56) Stateless Servers, Stateful Payloads: Sessions vs. Continuations, Rust (dmitrii.app)</div>
+<div class="test-item" id="nav-item-row-57-Coma__" onclick="scrollToRow('row-57-Coma__')" title="(57) Coma (Continuation Machine) Intermediate Verification Language (paulpatault.fr)">(57) Coma (Continuation Machine) Intermediate Verification Language (paulpatault.fr)</div>
+<div class="test-item" id="nav-item-row-58-Show_H" onclick="scrollToRow('row-58-Show_H')" title="(58) Show HN: Experimentation platform for simulating agents as users (514.ax)">(58) Show HN: Experimentation platform for simulating agents as users (514.ax)</div>
+<div class="test-item" id="nav-item-row-59-Talkin" onclick="scrollToRow('row-59-Talkin')" title="(59) Talking with Synopsys about the Physics of Chip Design at DAC 2026 (chipsandcheese.com)">(59) Talking with Synopsys about the Physics of Chip Design at DAC 2026 (chipsandcheese.com)</div>
+<div class="test-item" id="nav-item-row-60-Ask_HN" onclick="scrollToRow('row-60-Ask_HN')" title="(60) Ask HN: Ive built and open source P2P chat without back end">(60) Ask HN: Ive built and open source P2P chat without back end</div>
+<div class="test-item" id="nav-item-row-61-Show_H" onclick="scrollToRow('row-61-Show_H')" title="(61) Show HN: Hybrid memory retrieval for coding agents (github.com/yaminbakoh4-dot)">(61) Show HN: Hybrid memory retrieval for coding agents (github.com/yaminbakoh4-dot)</div>
+<div class="test-item" id="nav-item-row-62-A_Cali" onclick="scrollToRow('row-62-A_Cali')" title="(62) A California Home That Rotates 320 Degrees Takes a Spin on the Market (wsj.com)">(62) A California Home That Rotates 320 Degrees Takes a Spin on the Market (wsj.com)</div>
+<div class="test-item" id="nav-item-row-63-AI_spe" onclick="scrollToRow('row-63-AI_spe')" title="(63) AI spend observability down to individual User ID&#39;s and routes (kalaa.cc)">(63) AI spend observability down to individual User ID&#39;s and routes (kalaa.cc)</div>
+<div class="test-item" id="nav-item-row-64-OpenSS" onclick="scrollToRow('row-64-OpenSS')" title="(64) OpenSSH 10.5 released, AI assistice now welcome (openssh.org)">(64) OpenSSH 10.5 released, AI assistice now welcome (openssh.org)</div>
+<div class="test-item" id="nav-item-row-65-The_Pa" onclick="scrollToRow('row-65-The_Pa')" title="(65) The Pacing of the Frontier (thezvi.substack.com)">(65) The Pacing of the Frontier (thezvi.substack.com)</div>
+<div class="test-item" id="nav-item-row-66-Show_H" onclick="scrollToRow('row-66-Show_H')" title="(66) Show HN: Cjson.cpp, the new fastest-ever (constexpr) JSON parser (github.com/rfgplk)">(66) Show HN: Cjson.cpp, the new fastest-ever (constexpr) JSON parser (github.com/rfgplk)</div>
+<div class="test-item" id="nav-item-row-67-The_Ho" onclick="scrollToRow('row-67-The_Ho')" title="(67) The Housing Recession Is Over (conorsen.substack.com)">(67) The Housing Recession Is Over (conorsen.substack.com)</div>
+<div class="test-item" id="nav-item-row-68-Expire" onclick="scrollToRow('row-68-Expire')" title="(68) Expired DMARC endpoint exposed a NYSE Fortune 1000 infrastructure for $10 (sh.consulting)">(68) Expired DMARC endpoint exposed a NYSE Fortune 1000 infrastructure for $10 (sh.consulting)</div>
+<div class="test-item" id="nav-item-row-69-The_Un" onclick="scrollToRow('row-69-The_Un')" title="(69) The Unsloth Desktop App – run and train models locally (unsloth.ai)">(69) The Unsloth Desktop App – run and train models locally (unsloth.ai)</div>
+<div class="test-item" id="nav-item-row-70-Eight_" onclick="scrollToRow('row-70-Eight_')" title="(70) Eight architecture myths BUSTED by Samuel Hughes (bensouthwood.co.uk)">(70) Eight architecture myths BUSTED by Samuel Hughes (bensouthwood.co.uk)</div>
+<div class="test-item" id="nav-item-row-71-The_Sp" onclick="scrollToRow('row-71-The_Sp')" title="(71) The SpaceX Sham (dissentmagazine.org)">(71) The SpaceX Sham (dissentmagazine.org)</div>
+<div class="test-item" id="nav-item-row-72-TRMNL_" onclick="scrollToRow('row-72-TRMNL_')" title="(72) TRMNL ePaper Design System (github.com/usetrmnl)">(72) TRMNL ePaper Design System (github.com/usetrmnl)</div>
+<div class="test-item" id="nav-item-row-73-Remove" onclick="scrollToRow('row-73-Remove')" title="(73) Remove Claude&#39;s Watermark (removeclaudewatermark.org)">(73) Remove Claude&#39;s Watermark (removeclaudewatermark.org)</div>
+<div class="test-item" id="nav-item-row-74-Up_to_" onclick="scrollToRow('row-74-Up_to_')" title="(74) Up to 12.8x Improvement Observed for Gup_test with New Linux MM Patches (phoronix.com)">(74) Up to 12.8x Improvement Observed for Gup_test with New Linux MM Patches (phoronix.com)</div>
+<div class="test-item" id="nav-item-row-75-Flatpa" onclick="scrollToRow('row-75-Flatpa')" title="(75) Flatpak 1.19 Released with Nine Security Fixes (phoronix.com)">(75) Flatpak 1.19 Released with Nine Security Fixes (phoronix.com)</div>
+<div class="test-item" id="nav-item-row-76-Analyz" onclick="scrollToRow('row-76-Analyz')" title="(76) Analyzing Fedora&#39;s Slow Performance on the Framework Laptop 13 Pro (phoronix.com)">(76) Analyzing Fedora&#39;s Slow Performance on the Framework Laptop 13 Pro (phoronix.com)</div>
+<div class="test-item" id="nav-item-row-77-Rant_H" onclick="scrollToRow('row-77-Rant_H')" title="(77) Rant/Help Google auto-account bans are insane (accounts.google.com)">(77) Rant/Help Google auto-account bans are insane (accounts.google.com)</div>
+<div class="test-item" id="nav-item-row-78-China_" onclick="scrollToRow('row-78-China_')" title="(78) China warns of &quot;security backdoor&quot; in Anthropic AI coding tool [July 8, 2026] (cbsnews.com)">(78) China warns of &quot;security backdoor&quot; in Anthropic AI coding tool [July 8, 2026] (cbsnews.com)</div>
+<div class="test-item" id="nav-item-row-79-Deep_d" onclick="scrollToRow('row-79-Deep_d')" title="(79) Deep-diff NPM JavaScript library lost reference documentation (github.com/therohk)">(79) Deep-diff NPM JavaScript library lost reference documentation (github.com/therohk)</div>
+<div class="test-item" id="nav-item-row-80-Ask_HN" onclick="scrollToRow('row-80-Ask_HN')" title="(80) Ask HN: What are your thoughts on E2E software development using AI agents?">(80) Ask HN: What are your thoughts on E2E software development using AI agents?</div>
+<div class="test-item" id="nav-item-row-81-Phone_" onclick="scrollToRow('row-81-Phone_')" title="(81) Phone tracking adding to license plate readers, associating devices with cars (techxplore.com)">(81) Phone tracking adding to license plate readers, associating devices with cars (techxplore.com)</div>
+<div class="test-item" id="nav-item-row-82-Moving" onclick="scrollToRow('row-82-Moving')" title="(82) Moving integer division to floating-point is trivial (marc-b-reynolds.github.io)">(82) Moving integer division to floating-point is trivial (marc-b-reynolds.github.io)</div>
+<div class="test-item" id="nav-item-row-83-Experi" onclick="scrollToRow('row-83-Experi')" title="(83) Experience of Running Muse Glimmer on Mac (holaclaw.ai)">(83) Experience of Running Muse Glimmer on Mac (holaclaw.ai)</div>
+<div class="test-item" id="nav-item-row-84-Ask_HN" onclick="scrollToRow('row-84-Ask_HN')" title="(84) Ask HN: Are third party gguf/mmproj safe on Llama in production env">(84) Ask HN: Are third party gguf/mmproj safe on Llama in production env</div>
+<div class="test-item" id="nav-item-row-85-A_comp" onclick="scrollToRow('row-85-A_comp')" title="(85) A compiler that turns a day at my computer into agent memory, no LLM (github.com/nossa-y)">(85) A compiler that turns a day at my computer into agent memory, no LLM (github.com/nossa-y)</div>
+<div class="test-item" id="nav-item-row-86-Termin" onclick="scrollToRow('row-86-Termin')" title="(86) Terminal Browser (terminal-browser.com)">(86) Terminal Browser (terminal-browser.com)</div>
+<div class="test-item" id="nav-item-row-87-Tradec" onclick="scrollToRow('row-87-Tradec')" title="(87) Tradecraft: A portable format for context about detections (github.com/spectrum-sec)">(87) Tradecraft: A portable format for context about detections (github.com/spectrum-sec)</div>
+<div class="test-item" id="nav-item-row-88-Linux_" onclick="scrollToRow('row-88-Linux_')" title="(88) Linux desktop use surged to 22% on one workday, Cloudflare data shows (zdnet.com)">(88) Linux desktop use surged to 22% on one workday, Cloudflare data shows (zdnet.com)</div>
+<div class="test-item" id="nav-item-row-89-Coffee" onclick="scrollToRow('row-89-Coffee')" title="(89) Coffee Camp cattle farmer plants 14,000 trees for flood mitigation (abc.net.au)">(89) Coffee Camp cattle farmer plants 14,000 trees for flood mitigation (abc.net.au)</div>
+<div class="test-item" id="nav-item-row-90-Possib" onclick="scrollToRow('row-90-Possib')" title="(90) Possibly Resolving a Conjecture on Matrix Theory with GPT Sol (chillphysicsenjoyer.substack.com)">(90) Possibly Resolving a Conjecture on Matrix Theory with GPT Sol (chillphysicsenjoyer.substack.com)</div>
+<div class="test-item" id="nav-item-row-91-Spotif" onclick="scrollToRow('row-91-Spotif')" title="(91) Spotify to Label AI &#39;Artists&#39; (theguardian.com)">(91) Spotify to Label AI &#39;Artists&#39; (theguardian.com)</div>
+<div class="test-item" id="nav-item-row-92-Sphere" onclick="scrollToRow('row-92-Sphere')" title="(92) Sphere packing, AI, and mathematical beauty (empirical.health)">(92) Sphere packing, AI, and mathematical beauty (empirical.health)</div>
+<div class="test-item" id="nav-item-row-93-Handin" onclick="scrollToRow('row-93-Handin')" title="(93) Handing Out My Resume in Person (pretendtypewriter.net)">(93) Handing Out My Resume in Person (pretendtypewriter.net)</div>
+<div class="test-item" id="nav-item-row-94-Sopcos" onclick="scrollToRow('row-94-Sopcos')" title="(94) Sopcos Protocol Based Liability Attribution in Semi-Autonomous Industrial System (zenodo.org)">(94) Sopcos Protocol Based Liability Attribution in Semi-Autonomous Industrial System (zenodo.org)</div>
+<div class="test-item" id="nav-item-row-95-The_Pa" onclick="scrollToRow('row-95-The_Pa')" title="(95) The Path to Recursive Self-Improving Agents (github.com/d2i-ai)">(95) The Path to Recursive Self-Improving Agents (github.com/d2i-ai)</div>
+<div class="test-item" id="nav-item-row-96-July_s" onclick="scrollToRow('row-96-July_s')" title="(96) July&#39;s Heat Dome Put DR on the Front Lines with One of Our Biggest Event Weeks (uplight.com)">(96) July&#39;s Heat Dome Put DR on the Front Lines with One of Our Biggest Event Weeks (uplight.com)</div>
+<div class="test-item" id="nav-item-row-97-After_" onclick="scrollToRow('row-97-After_')" title="(97) After the IDE [video] (youtube.com)">(97) After the IDE [video] (youtube.com)</div>
+<div class="test-item" id="nav-item-row-98-Ask_HN" onclick="scrollToRow('row-98-Ask_HN')" title="(98) Ask HN: What email provider do you recommend for personal email?">(98) Ask HN: What email provider do you recommend for personal email?</div>
+<div class="test-item" id="nav-item-row-99-Show_H" onclick="scrollToRow('row-99-Show_H')" title="(99) Show HN: Chopi, a macOS filesystem+network sandbox to unleash your agents (github.com/danra)">(99) Show HN: Chopi, a macOS filesystem+network sandbox to unleash your agents (github.com/danra)</div>
+<div class="test-item" id="nav-item-row-100-Our_pu" onclick="scrollToRow('row-100-Our_pu')" title="(100) Our puzzle generator lied about difficulty. Twice">(100) Our puzzle generator lied about difficulty. Twice</div>
+  </nav>
+  <main class="viewport-main">
+    <section class="sticky-header-panel">
+      <h1>Linear Timeline Progression Report</h1>
+      <div class="chart-wrapper">
+        <svg viewBox="0 0 3400 120" width="3400" height="120" role="img" aria-label="Article timeline chart"><path d="M 70.0 58 L 102.9 58 L 135.9 58 L 168.8 58 L 201.7 58 L 234.6 58 L 267.6 58 L 300.5 58 L 333.4 58 L 366.4 58 L 399.3 58 L 432.2 58 L 465.2 58 L 498.1 58 L 531.0 58 L 563.9 58 L 596.9 58 L 629.8 58 L 662.7 58 L 695.7 58 L 728.6 58 L 761.5 58 L 794.4 58 L 827.4 58 L 860.3 58 L 893.2 58 L 926.2 58 L 959.1 58 L 992.0 58 L 1024.9 58 L 1057.9 58 L 1090.8 58 L 1123.7 58 L 1156.7 58 L 1189.6 58 L 1222.5 58 L 1255.5 58 L 1288.4 58 L 1321.3 58 L 1354.2 58 L 1387.2 58 L 1420.1 58 L 1453.0 58 L 1486.0 58 L 1518.9 58 L 1551.8 58 L 1584.7 58 L 1617.7 58 L 1650.6 58 L 1683.5 58 L 1716.5 58 L 1749.4 58 L 1782.3 58 L 1815.3 58 L 1848.2 58 L 1881.1 58 L 1914.0 58 L 1947.0 58 L 1979.9 58 L 2012.8 58 L 2045.8 58 L 2078.7 58 L 2111.6 58 L 2144.5 58 L 2177.5 58 L 2210.4 58 L 2243.3 58 L 2276.3 58 L 2309.2 58 L 2342.1 58 L 2375.1 58 L 2408.0 58 L 2440.9 58 L 2473.8 58 L 2506.8 58 L 2539.7 58 L 2572.6 58 L 2605.6 58 L 2638.5 58 L 2671.4 58 L 2704.3 58 L 2737.3 58 L 2770.2 58 L 2803.1 58 L 2836.1 58 L 2869.0 58 L 2901.9 58 L 2934.8 58 L 2967.8 58 L 3000.7 58 L 3033.6 58 L 3066.6 58 L 3099.5 58 L 3132.4 58 L 3165.4 58 L 3198.3 58 L 3231.2 58 L 3264.1 58 L 3297.1 58 L 3330.0 58" stroke="#777" stroke-width="4" fill="none" stroke-linecap="round" /><g class="chart-node" onclick="scrollToRow('row-1-Apple_')" data-target-id="row-1-Apple_"><title>Index: 1
+Title: Apple Executive in Charge of Pay and Wallet Services Is Leaving (yahoo.com)
+Age: 3 minutes ago
+Date: 2026-08-11T18:33:16 1786473196</title><line x1="70.0" y1="82" x2="70.0" y2="92" class="chart-tick" /><circle cx="70.0" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="70.0" y="62" text-anchor="middle" class="chart-label">1</text><text x="70.0" y="108" text-anchor="middle" class="chart-time">06:33:16 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-2-Appeti')" data-target-id="row-2-Appeti"><title>Index: 2
+Title: Appetite-suppressing hormone may protect liver from inflammation (medicalxpress.com)
+Age: 3 minutes ago
+Date: 2026-08-11T18:33:08 1786473188</title><line x1="102.9" y1="82" x2="102.9" y2="92" class="chart-tick" /><circle cx="102.9" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="102.9" y="62" text-anchor="middle" class="chart-label">2</text><text x="102.9" y="108" text-anchor="middle" class="chart-time">06:33:08 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-3-FieldF')" data-target-id="row-3-FieldF"><title>Index: 3
+Title: FieldFleet – self-hostable field operations built with Flutter and Supabase (taskfleetai.github.io)
+Age: 3 minutes ago
+Date: 2026-08-11T18:33:07 1786473187</title><line x1="135.9" y1="82" x2="135.9" y2="92" class="chart-tick" /><circle cx="135.9" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="135.9" y="62" text-anchor="middle" class="chart-label">3</text><text x="135.9" y="108" text-anchor="middle" class="chart-time">06:33:07 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-4-When_s')" data-target-id="row-4-When_s"><title>Index: 4
+Title: When&#39;s the next model coming out? (modelrumor.com)
+Age: 3 minutes ago
+Date: 2026-08-11T18:32:28 1786473148</title><line x1="168.8" y1="82" x2="168.8" y2="92" class="chart-tick" /><circle cx="168.8" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="168.8" y="62" text-anchor="middle" class="chart-label">4</text><text x="168.8" y="108" text-anchor="middle" class="chart-time">06:32:28 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-5-URLs_a')" data-target-id="row-5-URLs_a"><title>Index: 5
+Title: URLs aren&#39;t strings, and my recent encounter with this (utcc.utoronto.ca)
+Age: 5 minutes ago
+Date: 2026-08-11T18:31:10 1786473070</title><line x1="201.7" y1="82" x2="201.7" y2="92" class="chart-tick" /><circle cx="201.7" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="201.7" y="62" text-anchor="middle" class="chart-label">5</text><text x="201.7" y="108" text-anchor="middle" class="chart-time">06:31:10 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-6-Nobody')" data-target-id="row-6-Nobody"><title>Index: 6
+Title: Nobody is going to tell you your website is bad (cooked-phi-pink.vercel.app)
+Age: 5 minutes ago
+Date: 2026-08-11T18:31:05 1786473065</title><line x1="234.6" y1="82" x2="234.6" y2="92" class="chart-tick" /><circle cx="234.6" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="234.6" y="62" text-anchor="middle" class="chart-label">6</text><text x="234.6" y="108" text-anchor="middle" class="chart-time">06:31:05 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-7-What_s')" data-target-id="row-7-What_s"><title>Index: 7
+Title: What&#39;s the most memory-efficient way to check the weather forecast? (manualdousuario.net)
+Age: 7 minutes ago
+Date: 2026-08-11T18:29:03 1786472943</title><line x1="267.6" y1="82" x2="267.6" y2="92" class="chart-tick" /><circle cx="267.6" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="267.6" y="62" text-anchor="middle" class="chart-label">7</text><text x="267.6" y="108" text-anchor="middle" class="chart-time">06:29:03 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-8-Show_H')" data-target-id="row-8-Show_H"><title>Index: 8
+Title: Show HN: NotebookLM Calibre Plugin (github.com/divyenduz)
+Age: 7 minutes ago
+Date: 2026-08-11T18:28:30 1786472910</title><line x1="300.5" y1="82" x2="300.5" y2="92" class="chart-tick" /><circle cx="300.5" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="300.5" y="62" text-anchor="middle" class="chart-label">8</text><text x="300.5" y="108" text-anchor="middle" class="chart-time">06:28:30 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-9-Declar')" data-target-id="row-9-Declar"><title>Index: 9
+Title: Declarative Canvas UI for the browser, inspired by Swift (romanuk.org)
+Age: 8 minutes ago
+Date: 2026-08-11T18:27:42 1786472862</title><line x1="333.4" y1="82" x2="333.4" y2="92" class="chart-tick" /><circle cx="333.4" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="333.4" y="62" text-anchor="middle" class="chart-label">9</text><text x="333.4" y="108" text-anchor="middle" class="chart-time">06:27:42 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-10-Vitami')" data-target-id="row-10-Vitami"><title>Index: 10
+Title: Vitamin D regulates &gt;5% of the human genome (empirical.health)
+Age: 9 minutes ago
+Date: 2026-08-11T18:27:16 1786472836</title><line x1="366.4" y1="82" x2="366.4" y2="92" class="chart-tick" /><circle cx="366.4" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="366.4" y="62" text-anchor="middle" class="chart-label">10</text><text x="366.4" y="108" text-anchor="middle" class="chart-time">06:27:16 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-11-Three_')" data-target-id="row-11-Three_"><title>Index: 11
+Title: Three hour notice: congressional report incoming
+Age: 9 minutes ago
+Date: 2026-08-11T18:26:35 1786472795</title><line x1="399.3" y1="82" x2="399.3" y2="92" class="chart-tick" /><circle cx="399.3" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="399.3" y="62" text-anchor="middle" class="chart-label">11</text><text x="399.3" y="108" text-anchor="middle" class="chart-time">06:26:35 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-12-Unslot')" data-target-id="row-12-Unslot"><title>Index: 12
+Title: Unsloth Desktop: Open-Source App for Local Models (github.com/unslothai)
+Age: 10 minutes ago
+Date: 2026-08-11T18:25:50 1786472750</title><line x1="432.2" y1="82" x2="432.2" y2="92" class="chart-tick" /><circle cx="432.2" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="432.2" y="62" text-anchor="middle" class="chart-label">12</text><text x="432.2" y="108" text-anchor="middle" class="chart-time">06:25:50 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-13-FreeHo')" data-target-id="row-13-FreeHo"><title>Index: 13
+Title: FreeHosts – A community-curated directory of free hosting providers (freehosts.eu)
+Age: 11 minutes ago
+Date: 2026-08-11T18:24:52 1786472692</title><line x1="465.2" y1="82" x2="465.2" y2="92" class="chart-tick" /><circle cx="465.2" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="465.2" y="62" text-anchor="middle" class="chart-label">13</text><text x="465.2" y="108" text-anchor="middle" class="chart-time">06:24:52 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-14-The_Gr')" data-target-id="row-14-The_Gr"><title>Index: 14
+Title: The Great Copper Crunch: Why the Next Bull Run Is Just Getting Started (prinsights.substack.com)
+Age: 11 minutes ago
+Date: 2026-08-11T18:24:24 1786472664</title><line x1="498.1" y1="82" x2="498.1" y2="92" class="chart-tick" /><circle cx="498.1" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="498.1" y="62" text-anchor="middle" class="chart-label">14</text><text x="498.1" y="108" text-anchor="middle" class="chart-time">06:24:24 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-15-P____A')" data-target-id="row-15-P____A"><title>Index: 15
+Title: P/ – A simple and clear programming language
+Age: 12 minutes ago
+Date: 2026-08-11T18:23:27 1786472607</title><line x1="531.0" y1="82" x2="531.0" y2="92" class="chart-tick" /><circle cx="531.0" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="531.0" y="62" text-anchor="middle" class="chart-label">15</text><text x="531.0" y="108" text-anchor="middle" class="chart-time">06:23:27 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-16-Ask_HN')" data-target-id="row-16-Ask_HN"><title>Index: 16
+Title: Ask HN: How much Adderall do you use?
+Age: 13 minutes ago
+Date: 2026-08-11T18:22:36 1786472556</title><line x1="563.9" y1="82" x2="563.9" y2="92" class="chart-tick" /><circle cx="563.9" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="563.9" y="62" text-anchor="middle" class="chart-label">16</text><text x="563.9" y="108" text-anchor="middle" class="chart-time">06:22:36 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-17-Unders')" data-target-id="row-17-Unders"><title>Index: 17
+Title: Understanding an AI agent&#39;s memory through Harry Potter (squidler.io)
+Age: 13 minutes ago
+Date: 2026-08-11T18:22:26 1786472546</title><line x1="596.9" y1="82" x2="596.9" y2="92" class="chart-tick" /><circle cx="596.9" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="596.9" y="62" text-anchor="middle" class="chart-label">17</text><text x="596.9" y="108" text-anchor="middle" class="chart-time">06:22:26 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-18-My_hom')" data-target-id="row-18-My_hom"><title>Index: 18
+Title: My home internet died for half a day. So did every agent I had (bostrat.ai)
+Age: 14 minutes ago
+Date: 2026-08-11T18:21:26 1786472486</title><line x1="629.8" y1="82" x2="629.8" y2="92" class="chart-tick" /><circle cx="629.8" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="629.8" y="62" text-anchor="middle" class="chart-label">18</text><text x="629.8" y="108" text-anchor="middle" class="chart-time">06:21:26 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-19-Fedora')" data-target-id="row-19-Fedora"><title>Index: 19
+Title: Fedora CoreOS to Enable Systemd-Oomd and ZRAM Swap by Default (phoronix.com)
+Age: 16 minutes ago
+Date: 2026-08-11T18:20:11 1786472411</title><line x1="662.7" y1="82" x2="662.7" y2="92" class="chart-tick" /><circle cx="662.7" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="662.7" y="62" text-anchor="middle" class="chart-label">19</text><text x="662.7" y="108" text-anchor="middle" class="chart-time">06:20:11 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-20-Ask_HN')" data-target-id="row-20-Ask_HN"><title>Index: 20
+Title: Ask HN: When should you open-source your solution and why?
+Age: 16 minutes ago
+Date: 2026-08-11T18:20:03 1786472403</title><line x1="695.7" y1="82" x2="695.7" y2="92" class="chart-tick" /><circle cx="695.7" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="695.7" y="62" text-anchor="middle" class="chart-label">20</text><text x="695.7" y="108" text-anchor="middle" class="chart-time">06:20:03 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-21-TDD_in')" data-target-id="row-21-TDD_in"><title>Index: 21
+Title: TDD inside the agent loop – theater or actual value? (martinfowler.com)
+Age: 16 minutes ago
+Date: 2026-08-11T18:19:51 1786472391</title><line x1="728.6" y1="82" x2="728.6" y2="92" class="chart-tick" /><circle cx="728.6" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="728.6" y="62" text-anchor="middle" class="chart-label">21</text><text x="728.6" y="108" text-anchor="middle" class="chart-time">06:19:51 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-22-Show_H')" data-target-id="row-22-Show_H"><title>Index: 22
+Title: Show HN: HyperSAE – Hyperbolic Sparse Autoencoders for LLM Interpretability (github.com/vishal-dehurdle)
+Age: 17 minutes ago
+Date: 2026-08-11T18:19:02 1786472342</title><line x1="761.5" y1="82" x2="761.5" y2="92" class="chart-tick" /><circle cx="761.5" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="761.5" y="62" text-anchor="middle" class="chart-label">22</text><text x="761.5" y="108" text-anchor="middle" class="chart-time">06:19:02 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-23-LTX_2_')" data-target-id="row-23-LTX_2_"><title>Index: 23
+Title: LTX 2.5 a stronger foundation for what&#39;s being built (ltx.io)
+Age: 17 minutes ago
+Date: 2026-08-11T18:18:43 1786472323</title><line x1="794.4" y1="82" x2="794.4" y2="92" class="chart-tick" /><circle cx="794.4" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="794.4" y="62" text-anchor="middle" class="chart-label">23</text><text x="794.4" y="108" text-anchor="middle" class="chart-time">06:18:43 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-24-Ask_HN')" data-target-id="row-24-Ask_HN"><title>Index: 24
+Title: Ask HN: How do you keep 54 LLM workflows on the right models?
+Age: 19 minutes ago
+Date: 2026-08-11T18:17:16 1786472236</title><line x1="827.4" y1="82" x2="827.4" y2="92" class="chart-tick" /><circle cx="827.4" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="827.4" y="62" text-anchor="middle" class="chart-label">24</text><text x="827.4" y="108" text-anchor="middle" class="chart-time">06:17:16 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-25-OpenAI')" data-target-id="row-25-OpenAI"><title>Index: 25
+Title: OpenAI&#39;s head of ethics leaves startup less than one year after joining (ft.com)
+Age: 21 minutes ago
+Date: 2026-08-11T18:15:03 1786472103</title><line x1="860.3" y1="82" x2="860.3" y2="92" class="chart-tick" /><circle cx="860.3" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="860.3" y="62" text-anchor="middle" class="chart-label">25</text><text x="860.3" y="108" text-anchor="middle" class="chart-time">06:15:03 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-26-A_Prel')" data-target-id="row-26-A_Prel"><title>Index: 26
+Title: A Preliminary Study on Simultaneous Coscheduling for Discrete GPU vs. Fused GPU (arxiv.org)
+Age: 23 minutes ago
+Date: 2026-08-11T18:12:44 1786471964</title><line x1="893.2" y1="82" x2="893.2" y2="92" class="chart-tick" /><circle cx="893.2" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="893.2" y="62" text-anchor="middle" class="chart-label">26</text><text x="893.2" y="108" text-anchor="middle" class="chart-time">06:12:44 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-27-Show_H')" data-target-id="row-27-Show_H"><title>Index: 27
+Title: Show HN: SmokeOps – describe a flow, get checks you rerun without AI (github.com/gate3)
+Age: 23 minutes ago
+Date: 2026-08-11T18:12:40 1786471960</title><line x1="926.2" y1="82" x2="926.2" y2="92" class="chart-tick" /><circle cx="926.2" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="926.2" y="62" text-anchor="middle" class="chart-label">27</text><text x="926.2" y="108" text-anchor="middle" class="chart-time">06:12:40 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-28-Imprin')" data-target-id="row-28-Imprin"><title>Index: 28
+Title: Imprint – Fine-tune MoE LLMs bigger than your RAM (github.com/sigma0101111)
+Age: 24 minutes ago
+Date: 2026-08-11T18:11:52 1786471912</title><line x1="959.1" y1="82" x2="959.1" y2="92" class="chart-tick" /><circle cx="959.1" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="959.1" y="62" text-anchor="middle" class="chart-label">28</text><text x="959.1" y="108" text-anchor="middle" class="chart-time">06:11:52 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-29-Sam_s_')" data-target-id="row-29-Sam_s_"><title>Index: 29
+Title: Sam&#39;s News – Free AI News Aggregator (samnews.news)
+Age: 26 minutes ago
+Date: 2026-08-11T18:10:12 1786471812</title><line x1="992.0" y1="82" x2="992.0" y2="92" class="chart-tick" /><circle cx="992.0" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="992.0" y="62" text-anchor="middle" class="chart-label">29</text><text x="992.0" y="108" text-anchor="middle" class="chart-time">06:10:12 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-30-We_Use')" data-target-id="row-30-We_Use"><title>Index: 30
+Title: We Used to Get Jobs (ironicsans.ghost.io)
+Age: 26 minutes ago
+Date: 2026-08-11T18:09:56 1786471796</title><line x1="1024.9" y1="82" x2="1024.9" y2="92" class="chart-tick" /><circle cx="1024.9" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1024.9" y="62" text-anchor="middle" class="chart-label">30</text><text x="1024.9" y="108" text-anchor="middle" class="chart-time">06:09:56 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-31-Nvidia')" data-target-id="row-31-Nvidia"><title>Index: 31
+Title: Nvidia building 1T-parameter Nemotron 4 to rival open AI models (reuters.com)
+Age: 26 minutes ago
+Date: 2026-08-11T18:09:46 1786471786</title><line x1="1057.9" y1="82" x2="1057.9" y2="92" class="chart-tick" /><circle cx="1057.9" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1057.9" y="62" text-anchor="middle" class="chart-label">31</text><text x="1057.9" y="108" text-anchor="middle" class="chart-time">06:09:46 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-32-Cynthi')" data-target-id="row-32-Cynthi"><title>Index: 32
+Title: Cynthion: Open-source USB test instrument (greatscottgadgets.com)
+Age: 27 minutes ago
+Date: 2026-08-11T18:09:13 1786471753</title><line x1="1090.8" y1="82" x2="1090.8" y2="92" class="chart-tick" /><circle cx="1090.8" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1090.8" y="62" text-anchor="middle" class="chart-label">32</text><text x="1090.8" y="108" text-anchor="middle" class="chart-time">06:09:13 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-33-Elon_M')" data-target-id="row-33-Elon_M"><title>Index: 33
+Title: Elon Musk ran a decoy super PAC to compare Trump with RGB (google.com)
+Age: 28 minutes ago
+Date: 2026-08-11T18:07:39 1786471659</title><line x1="1123.7" y1="82" x2="1123.7" y2="92" class="chart-tick" /><circle cx="1123.7" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1123.7" y="62" text-anchor="middle" class="chart-label">33</text><text x="1123.7" y="108" text-anchor="middle" class="chart-time">06:07:39 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-34-The_wo')" data-target-id="row-34-The_wo"><title>Index: 34
+Title: The worst part of using multiple LLM providers is not the API differences (github.com/maximhq)
+Age: 29 minutes ago
+Date: 2026-08-11T18:07:13 1786471633</title><line x1="1156.7" y1="82" x2="1156.7" y2="92" class="chart-tick" /><circle cx="1156.7" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1156.7" y="62" text-anchor="middle" class="chart-label">34</text><text x="1156.7" y="108" text-anchor="middle" class="chart-time">06:07:13 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-35-A_bug_')" data-target-id="row-35-A_bug_"><title>Index: 35
+Title: A bug becoming a feature (1972 edition) (aresluna.org)
+Age: 29 minutes ago
+Date: 2026-08-11T18:07:03 1786471623</title><line x1="1189.6" y1="82" x2="1189.6" y2="92" class="chart-tick" /><circle cx="1189.6" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1189.6" y="62" text-anchor="middle" class="chart-label">35</text><text x="1189.6" y="108" text-anchor="middle" class="chart-time">06:07:03 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-36-Ethica')" data-target-id="row-36-Ethica"><title>Index: 36
+Title: Ethical Cold Outreach (val.town)
+Age: 29 minutes ago
+Date: 2026-08-11T18:06:55 1786471615</title><line x1="1222.5" y1="82" x2="1222.5" y2="92" class="chart-tick" /><circle cx="1222.5" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1222.5" y="62" text-anchor="middle" class="chart-label">36</text><text x="1222.5" y="108" text-anchor="middle" class="chart-time">06:06:55 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-37-Report')" data-target-id="row-37-Report"><title>Index: 37
+Title: Report from the Security Mines (val.town)
+Age: 29 minutes ago
+Date: 2026-08-11T18:06:45 1786471605</title><line x1="1255.5" y1="82" x2="1255.5" y2="92" class="chart-tick" /><circle cx="1255.5" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1255.5" y="62" text-anchor="middle" class="chart-label">37</text><text x="1255.5" y="108" text-anchor="middle" class="chart-time">06:06:45 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-38-Docfoo')" data-target-id="row-38-Docfoo"><title>Index: 38
+Title: Docfooding: Eating Our Own Documentation (val.town)
+Age: 29 minutes ago
+Date: 2026-08-11T18:06:34 1786471594</title><line x1="1288.4" y1="82" x2="1288.4" y2="92" class="chart-tick" /><circle cx="1288.4" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1288.4" y="62" text-anchor="middle" class="chart-label">38</text><text x="1288.4" y="108" text-anchor="middle" class="chart-time">06:06:34 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-39-Hack_s')" data-target-id="row-39-Hack_s"><title>Index: 39
+Title: Hack&#39;s Law (wikipedia.org)
+Age: 30 minutes ago
+Date: 2026-08-11T18:06:21 1786471581</title><line x1="1321.3" y1="82" x2="1321.3" y2="92" class="chart-tick" /><circle cx="1321.3" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1321.3" y="62" text-anchor="middle" class="chart-label">39</text><text x="1321.3" y="108" text-anchor="middle" class="chart-time">06:06:21 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-40-Would_')" data-target-id="row-40-Would_"><title>Index: 40
+Title: Would Appreciate Any Feedback (deskfellow.app)
+Age: 31 minutes ago
+Date: 2026-08-11T18:04:42 1786471482</title><line x1="1354.2" y1="82" x2="1354.2" y2="92" class="chart-tick" /><circle cx="1354.2" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1354.2" y="62" text-anchor="middle" class="chart-label">40</text><text x="1354.2" y="108" text-anchor="middle" class="chart-time">06:04:42 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-41-ChatGP')" data-target-id="row-41-ChatGP"><title>Index: 41
+Title: ChatGPT Desktop App for Linux (twitter.com/openai)
+Age: 32 minutes ago
+Date: 2026-08-11T18:03:56 1786471436</title><line x1="1387.2" y1="82" x2="1387.2" y2="92" class="chart-tick" /><circle cx="1387.2" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1387.2" y="62" text-anchor="middle" class="chart-label">41</text><text x="1387.2" y="108" text-anchor="middle" class="chart-time">06:03:56 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-42-Why_Ar')" data-target-id="row-42-Why_Ar"><title>Index: 42
+Title: Why Are Rivers So Mathematical? (quantamagazine.org)
+Age: 33 minutes ago
+Date: 2026-08-11T18:02:46 1786471366</title><line x1="1420.1" y1="82" x2="1420.1" y2="92" class="chart-tick" /><circle cx="1420.1" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1420.1" y="62" text-anchor="middle" class="chart-label">42</text><text x="1420.1" y="108" text-anchor="middle" class="chart-time">06:02:46 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-43-_2_1__')" data-target-id="row-43-_2_1__"><title>Index: 43
+Title: (2,1)-C1P is NP-complete (zenodo.org)
+Age: 33 minutes ago
+Date: 2026-08-11T18:02:28 1786471348</title><line x1="1453.0" y1="82" x2="1453.0" y2="92" class="chart-tick" /><circle cx="1453.0" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1453.0" y="62" text-anchor="middle" class="chart-label">43</text><text x="1453.0" y="108" text-anchor="middle" class="chart-time">06:02:28 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-44-Inacce')" data-target-id="row-44-Inacce"><title>Index: 44
+Title: Inaccessible .bnnsir files on macOS Sequoia (lapcatsoftware.com)
+Age: 34 minutes ago
+Date: 2026-08-11T18:02:19 1786471339</title><line x1="1486.0" y1="82" x2="1486.0" y2="92" class="chart-tick" /><circle cx="1486.0" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1486.0" y="62" text-anchor="middle" class="chart-label">44</text><text x="1486.0" y="108" text-anchor="middle" class="chart-time">06:02:19 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-45-How_to')" data-target-id="row-45-How_to"><title>Index: 45
+Title: How to Appreciate (how-to-appreciate.pages.dev)
+Age: 34 minutes ago
+Date: 2026-08-11T18:02:14 1786471334</title><line x1="1518.9" y1="82" x2="1518.9" y2="92" class="chart-tick" /><circle cx="1518.9" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1518.9" y="62" text-anchor="middle" class="chart-label">45</text><text x="1518.9" y="108" text-anchor="middle" class="chart-time">06:02:14 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-46-Hetzne')" data-target-id="row-46-Hetzne"><title>Index: 46
+Title: Hetzner: Open Weights Inference API (hetzner.com)
+Age: 34 minutes ago
+Date: 2026-08-11T18:02:08 1786471328</title><line x1="1551.8" y1="82" x2="1551.8" y2="92" class="chart-tick" /><circle cx="1551.8" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1551.8" y="62" text-anchor="middle" class="chart-label">46</text><text x="1551.8" y="108" text-anchor="middle" class="chart-time">06:02:08 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-47-Flight')" data-target-id="row-47-Flight"><title>Index: 47
+Title: FlightAware sues Kalshi over flight cancellation prediction markets [pdf] (courtlistener.com)
+Age: 34 minutes ago
+Date: 2026-08-11T18:01:41 1786471301</title><line x1="1584.7" y1="82" x2="1584.7" y2="92" class="chart-tick" /><circle cx="1584.7" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1584.7" y="62" text-anchor="middle" class="chart-label">47</text><text x="1584.7" y="108" text-anchor="middle" class="chart-time">06:01:41 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-48-Shrink')" data-target-id="row-48-Shrink"><title>Index: 48
+Title: Shrinking student populations cause spike in public school closures across U.S. (washingtonpost.com)
+Age: 34 minutes ago
+Date: 2026-08-11T18:01:29 1786471289</title><line x1="1617.7" y1="82" x2="1617.7" y2="92" class="chart-tick" /><circle cx="1617.7" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1617.7" y="62" text-anchor="middle" class="chart-label">48</text><text x="1617.7" y="108" text-anchor="middle" class="chart-time">06:01:29 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-49-Termin')" data-target-id="row-49-Termin"><title>Index: 49
+Title: TerminalWidget for Mac, iPhone, and iPad (terminalwidget.app)
+Age: 35 minutes ago
+Date: 2026-08-11T18:00:31 1786471231</title><line x1="1650.6" y1="82" x2="1650.6" y2="92" class="chart-tick" /><circle cx="1650.6" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1650.6" y="62" text-anchor="middle" class="chart-label">49</text><text x="1650.6" y="108" text-anchor="middle" class="chart-time">06:00:31 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-50-Facebo')" data-target-id="row-50-Facebo"><title>Index: 50
+Title: Faceboard: A Case Study in Community-Led Information Exchange (Satire) (mcsweeneys.net)
+Age: 36 minutes ago
+Date: 2026-08-11T17:59:54 1786471194</title><line x1="1683.5" y1="82" x2="1683.5" y2="92" class="chart-tick" /><circle cx="1683.5" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1683.5" y="62" text-anchor="middle" class="chart-label">50</text><text x="1683.5" y="108" text-anchor="middle" class="chart-time">05:59:54 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-51-Provin')" data-target-id="row-51-Provin"><title>Index: 51
+Title: Proving Muse Glimmer in Zero-Knowledge at 85 Tok/S on an H100 (attestable.com)
+Age: 37 minutes ago
+Date: 2026-08-11T17:58:58 1786471138</title><line x1="1716.5" y1="82" x2="1716.5" y2="92" class="chart-tick" /><circle cx="1716.5" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1716.5" y="62" text-anchor="middle" class="chart-label">51</text><text x="1716.5" y="108" text-anchor="middle" class="chart-time">05:58:58 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-52-Ask_HN')" data-target-id="row-52-Ask_HN"><title>Index: 52
+Title: Ask HN: Any good alternatives to Claude that are just not Claude?
+Age: 37 minutes ago
+Date: 2026-08-11T17:58:57 1786471137</title><line x1="1749.4" y1="82" x2="1749.4" y2="92" class="chart-tick" /><circle cx="1749.4" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1749.4" y="62" text-anchor="middle" class="chart-label">52</text><text x="1749.4" y="108" text-anchor="middle" class="chart-time">05:58:57 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-53-Show_H')" data-target-id="row-53-Show_H"><title>Index: 53
+Title: Show HN: PR Nutrition, a local rule-based CLI for pull request triage (github.com/param-10)
+Age: 39 minutes ago
+Date: 2026-08-11T17:56:38 1786470998</title><line x1="1782.3" y1="82" x2="1782.3" y2="92" class="chart-tick" /><circle cx="1782.3" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1782.3" y="62" text-anchor="middle" class="chart-label">53</text><text x="1782.3" y="108" text-anchor="middle" class="chart-time">05:56:38 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-54-Show_H')" data-target-id="row-54-Show_H"><title>Index: 54
+Title: Show HN: TermDOM – HTML, CSS and JavaScript (With a Real DOM) for TUIs and CLIs (github.com/bikeshaving)
+Age: 41 minutes ago
+Date: 2026-08-11T17:55:20 1786470920</title><line x1="1815.3" y1="82" x2="1815.3" y2="92" class="chart-tick" /><circle cx="1815.3" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1815.3" y="62" text-anchor="middle" class="chart-label">54</text><text x="1815.3" y="108" text-anchor="middle" class="chart-time">05:55:20 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-55-Termin')" data-target-id="row-55-Termin"><title>Index: 55
+Title: Terminal-Bench 3.0 (frontierbench.ai)
+Age: 41 minutes ago
+Date: 2026-08-11T17:54:54 1786470894</title><line x1="1848.2" y1="82" x2="1848.2" y2="92" class="chart-tick" /><circle cx="1848.2" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1848.2" y="62" text-anchor="middle" class="chart-label">55</text><text x="1848.2" y="108" text-anchor="middle" class="chart-time">05:54:54 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-56-Statel')" data-target-id="row-56-Statel"><title>Index: 56
+Title: Stateless Servers, Stateful Payloads: Sessions vs. Continuations, Rust (dmitrii.app)
+Age: 42 minutes ago
+Date: 2026-08-11T17:54:20 1786470860</title><line x1="1881.1" y1="82" x2="1881.1" y2="92" class="chart-tick" /><circle cx="1881.1" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1881.1" y="62" text-anchor="middle" class="chart-label">56</text><text x="1881.1" y="108" text-anchor="middle" class="chart-time">05:54:20 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-57-Coma__')" data-target-id="row-57-Coma__"><title>Index: 57
+Title: Coma (Continuation Machine) Intermediate Verification Language (paulpatault.fr)
+Age: 42 minutes ago
+Date: 2026-08-11T17:54:03 1786470843</title><line x1="1914.0" y1="82" x2="1914.0" y2="92" class="chart-tick" /><circle cx="1914.0" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1914.0" y="62" text-anchor="middle" class="chart-label">57</text><text x="1914.0" y="108" text-anchor="middle" class="chart-time">05:54:03 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-58-Show_H')" data-target-id="row-58-Show_H"><title>Index: 58
+Title: Show HN: Experimentation platform for simulating agents as users (514.ax)
+Age: 42 minutes ago
+Date: 2026-08-11T17:53:53 1786470833</title><line x1="1947.0" y1="82" x2="1947.0" y2="92" class="chart-tick" /><circle cx="1947.0" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1947.0" y="62" text-anchor="middle" class="chart-label">58</text><text x="1947.0" y="108" text-anchor="middle" class="chart-time">05:53:53 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-59-Talkin')" data-target-id="row-59-Talkin"><title>Index: 59
+Title: Talking with Synopsys about the Physics of Chip Design at DAC 2026 (chipsandcheese.com)
+Age: 44 minutes ago
+Date: 2026-08-11T17:52:18 1786470738</title><line x1="1979.9" y1="82" x2="1979.9" y2="92" class="chart-tick" /><circle cx="1979.9" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="1979.9" y="62" text-anchor="middle" class="chart-label">59</text><text x="1979.9" y="108" text-anchor="middle" class="chart-time">05:52:18 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-60-Ask_HN')" data-target-id="row-60-Ask_HN"><title>Index: 60
+Title: Ask HN: Ive built and open source P2P chat without back end
+Age: 44 minutes ago
+Date: 2026-08-11T17:51:49 1786470709</title><line x1="2012.8" y1="82" x2="2012.8" y2="92" class="chart-tick" /><circle cx="2012.8" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2012.8" y="62" text-anchor="middle" class="chart-label">60</text><text x="2012.8" y="108" text-anchor="middle" class="chart-time">05:51:49 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-61-Show_H')" data-target-id="row-61-Show_H"><title>Index: 61
+Title: Show HN: Hybrid memory retrieval for coding agents (github.com/yaminbakoh4-dot)
+Age: 44 minutes ago
+Date: 2026-08-11T17:51:35 1786470695</title><line x1="2045.8" y1="82" x2="2045.8" y2="92" class="chart-tick" /><circle cx="2045.8" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2045.8" y="62" text-anchor="middle" class="chart-label">61</text><text x="2045.8" y="108" text-anchor="middle" class="chart-time">05:51:35 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-62-A_Cali')" data-target-id="row-62-A_Cali"><title>Index: 62
+Title: A California Home That Rotates 320 Degrees Takes a Spin on the Market (wsj.com)
+Age: 45 minutes ago
+Date: 2026-08-11T17:51:06 1786470666</title><line x1="2078.7" y1="82" x2="2078.7" y2="92" class="chart-tick" /><circle cx="2078.7" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2078.7" y="62" text-anchor="middle" class="chart-label">62</text><text x="2078.7" y="108" text-anchor="middle" class="chart-time">05:51:06 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-63-AI_spe')" data-target-id="row-63-AI_spe"><title>Index: 63
+Title: AI spend observability down to individual User ID&#39;s and routes (kalaa.cc)
+Age: 45 minutes ago
+Date: 2026-08-11T17:50:42 1786470642</title><line x1="2111.6" y1="82" x2="2111.6" y2="92" class="chart-tick" /><circle cx="2111.6" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2111.6" y="62" text-anchor="middle" class="chart-label">63</text><text x="2111.6" y="108" text-anchor="middle" class="chart-time">05:50:42 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-64-OpenSS')" data-target-id="row-64-OpenSS"><title>Index: 64
+Title: OpenSSH 10.5 released, AI assistice now welcome (openssh.org)
+Age: 46 minutes ago
+Date: 2026-08-11T17:49:37 1786470577</title><line x1="2144.5" y1="82" x2="2144.5" y2="92" class="chart-tick" /><circle cx="2144.5" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2144.5" y="62" text-anchor="middle" class="chart-label">64</text><text x="2144.5" y="108" text-anchor="middle" class="chart-time">05:49:37 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-65-The_Pa')" data-target-id="row-65-The_Pa"><title>Index: 65
+Title: The Pacing of the Frontier (thezvi.substack.com)
+Age: 47 minutes ago
+Date: 2026-08-11T17:48:48 1786470528</title><line x1="2177.5" y1="82" x2="2177.5" y2="92" class="chart-tick" /><circle cx="2177.5" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2177.5" y="62" text-anchor="middle" class="chart-label">65</text><text x="2177.5" y="108" text-anchor="middle" class="chart-time">05:48:48 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-66-Show_H')" data-target-id="row-66-Show_H"><title>Index: 66
+Title: Show HN: Cjson.cpp, the new fastest-ever (constexpr) JSON parser (github.com/rfgplk)
+Age: 47 minutes ago
+Date: 2026-08-11T17:48:36 1786470516</title><line x1="2210.4" y1="82" x2="2210.4" y2="92" class="chart-tick" /><circle cx="2210.4" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2210.4" y="62" text-anchor="middle" class="chart-label">66</text><text x="2210.4" y="108" text-anchor="middle" class="chart-time">05:48:36 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-67-The_Ho')" data-target-id="row-67-The_Ho"><title>Index: 67
+Title: The Housing Recession Is Over (conorsen.substack.com)
+Age: 48 minutes ago
+Date: 2026-08-11T17:48:03 1786470483</title><line x1="2243.3" y1="82" x2="2243.3" y2="92" class="chart-tick" /><circle cx="2243.3" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2243.3" y="62" text-anchor="middle" class="chart-label">67</text><text x="2243.3" y="108" text-anchor="middle" class="chart-time">05:48:03 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-68-Expire')" data-target-id="row-68-Expire"><title>Index: 68
+Title: Expired DMARC endpoint exposed a NYSE Fortune 1000 infrastructure for $10 (sh.consulting)
+Age: 48 minutes ago
+Date: 2026-08-11T17:47:49 1786470469</title><line x1="2276.3" y1="82" x2="2276.3" y2="92" class="chart-tick" /><circle cx="2276.3" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2276.3" y="62" text-anchor="middle" class="chart-label">68</text><text x="2276.3" y="108" text-anchor="middle" class="chart-time">05:47:49 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-69-The_Un')" data-target-id="row-69-The_Un"><title>Index: 69
+Title: The Unsloth Desktop App – run and train models locally (unsloth.ai)
+Age: 48 minutes ago
+Date: 2026-08-11T17:47:44 1786470464</title><line x1="2309.2" y1="82" x2="2309.2" y2="92" class="chart-tick" /><circle cx="2309.2" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2309.2" y="62" text-anchor="middle" class="chart-label">69</text><text x="2309.2" y="108" text-anchor="middle" class="chart-time">05:47:44 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-70-Eight_')" data-target-id="row-70-Eight_"><title>Index: 70
+Title: Eight architecture myths BUSTED by Samuel Hughes (bensouthwood.co.uk)
+Age: 48 minutes ago
+Date: 2026-08-11T17:47:38 1786470458</title><line x1="2342.1" y1="82" x2="2342.1" y2="92" class="chart-tick" /><circle cx="2342.1" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2342.1" y="62" text-anchor="middle" class="chart-label">70</text><text x="2342.1" y="108" text-anchor="middle" class="chart-time">05:47:38 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-71-The_Sp')" data-target-id="row-71-The_Sp"><title>Index: 71
+Title: The SpaceX Sham (dissentmagazine.org)
+Age: 49 minutes ago
+Date: 2026-08-11T17:47:03 1786470423</title><line x1="2375.1" y1="82" x2="2375.1" y2="92" class="chart-tick" /><circle cx="2375.1" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2375.1" y="62" text-anchor="middle" class="chart-label">71</text><text x="2375.1" y="108" text-anchor="middle" class="chart-time">05:47:03 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-72-TRMNL_')" data-target-id="row-72-TRMNL_"><title>Index: 72
+Title: TRMNL ePaper Design System (github.com/usetrmnl)
+Age: 50 minutes ago
+Date: 2026-08-11T17:46:21 1786470381</title><line x1="2408.0" y1="82" x2="2408.0" y2="92" class="chart-tick" /><circle cx="2408.0" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2408.0" y="62" text-anchor="middle" class="chart-label">72</text><text x="2408.0" y="108" text-anchor="middle" class="chart-time">05:46:21 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-73-Remove')" data-target-id="row-73-Remove"><title>Index: 73
+Title: Remove Claude&#39;s Watermark (removeclaudewatermark.org)
+Age: 51 minutes ago
+Date: 2026-08-11T17:45:21 1786470321</title><line x1="2440.9" y1="82" x2="2440.9" y2="92" class="chart-tick" /><circle cx="2440.9" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2440.9" y="62" text-anchor="middle" class="chart-label">73</text><text x="2440.9" y="108" text-anchor="middle" class="chart-time">05:45:21 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-74-Up_to_')" data-target-id="row-74-Up_to_"><title>Index: 74
+Title: Up to 12.8x Improvement Observed for Gup_test with New Linux MM Patches (phoronix.com)
+Age: 51 minutes ago
+Date: 2026-08-11T17:45:13 1786470313</title><line x1="2473.8" y1="82" x2="2473.8" y2="92" class="chart-tick" /><circle cx="2473.8" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2473.8" y="62" text-anchor="middle" class="chart-label">74</text><text x="2473.8" y="108" text-anchor="middle" class="chart-time">05:45:13 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-75-Flatpa')" data-target-id="row-75-Flatpa"><title>Index: 75
+Title: Flatpak 1.19 Released with Nine Security Fixes (phoronix.com)
+Age: 51 minutes ago
+Date: 2026-08-11T17:44:51 1786470291</title><line x1="2506.8" y1="82" x2="2506.8" y2="92" class="chart-tick" /><circle cx="2506.8" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2506.8" y="62" text-anchor="middle" class="chart-label">75</text><text x="2506.8" y="108" text-anchor="middle" class="chart-time">05:44:51 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-76-Analyz')" data-target-id="row-76-Analyz"><title>Index: 76
+Title: Analyzing Fedora&#39;s Slow Performance on the Framework Laptop 13 Pro (phoronix.com)
+Age: 51 minutes ago
+Date: 2026-08-11T17:44:30 1786470270</title><line x1="2539.7" y1="82" x2="2539.7" y2="92" class="chart-tick" /><circle cx="2539.7" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2539.7" y="62" text-anchor="middle" class="chart-label">76</text><text x="2539.7" y="108" text-anchor="middle" class="chart-time">05:44:30 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-77-Rant_H')" data-target-id="row-77-Rant_H"><title>Index: 77
+Title: Rant/Help Google auto-account bans are insane (accounts.google.com)
+Age: 51 minutes ago
+Date: 2026-08-11T17:44:25 1786470265</title><line x1="2572.6" y1="82" x2="2572.6" y2="92" class="chart-tick" /><circle cx="2572.6" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2572.6" y="62" text-anchor="middle" class="chart-label">77</text><text x="2572.6" y="108" text-anchor="middle" class="chart-time">05:44:25 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-78-China_')" data-target-id="row-78-China_"><title>Index: 78
+Title: China warns of &quot;security backdoor&quot; in Anthropic AI coding tool [July 8, 2026] (cbsnews.com)
+Age: 52 minutes ago
+Date: 2026-08-11T17:43:55 1786470235</title><line x1="2605.6" y1="82" x2="2605.6" y2="92" class="chart-tick" /><circle cx="2605.6" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2605.6" y="62" text-anchor="middle" class="chart-label">78</text><text x="2605.6" y="108" text-anchor="middle" class="chart-time">05:43:55 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-79-Deep_d')" data-target-id="row-79-Deep_d"><title>Index: 79
+Title: Deep-diff NPM JavaScript library lost reference documentation (github.com/therohk)
+Age: 52 minutes ago
+Date: 2026-08-11T17:43:36 1786470216</title><line x1="2638.5" y1="82" x2="2638.5" y2="92" class="chart-tick" /><circle cx="2638.5" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2638.5" y="62" text-anchor="middle" class="chart-label">79</text><text x="2638.5" y="108" text-anchor="middle" class="chart-time">05:43:36 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-80-Ask_HN')" data-target-id="row-80-Ask_HN"><title>Index: 80
+Title: Ask HN: What are your thoughts on E2E software development using AI agents?
+Age: 53 minutes ago
+Date: 2026-08-11T17:43:11 1786470191</title><line x1="2671.4" y1="82" x2="2671.4" y2="92" class="chart-tick" /><circle cx="2671.4" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2671.4" y="62" text-anchor="middle" class="chart-label">80</text><text x="2671.4" y="108" text-anchor="middle" class="chart-time">05:43:11 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-81-Phone_')" data-target-id="row-81-Phone_"><title>Index: 81
+Title: Phone tracking adding to license plate readers, associating devices with cars (techxplore.com)
+Age: 53 minutes ago
+Date: 2026-08-11T17:42:39 1786470159</title><line x1="2704.3" y1="82" x2="2704.3" y2="92" class="chart-tick" /><circle cx="2704.3" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2704.3" y="62" text-anchor="middle" class="chart-label">81</text><text x="2704.3" y="108" text-anchor="middle" class="chart-time">05:42:39 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-82-Moving')" data-target-id="row-82-Moving"><title>Index: 82
+Title: Moving integer division to floating-point is trivial (marc-b-reynolds.github.io)
+Age: 54 minutes ago
+Date: 2026-08-11T17:42:04 1786470124</title><line x1="2737.3" y1="82" x2="2737.3" y2="92" class="chart-tick" /><circle cx="2737.3" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2737.3" y="62" text-anchor="middle" class="chart-label">82</text><text x="2737.3" y="108" text-anchor="middle" class="chart-time">05:42:04 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-83-Experi')" data-target-id="row-83-Experi"><title>Index: 83
+Title: Experience of Running Muse Glimmer on Mac (holaclaw.ai)
+Age: 54 minutes ago
+Date: 2026-08-11T17:42:03 1786470123</title><line x1="2770.2" y1="82" x2="2770.2" y2="92" class="chart-tick" /><circle cx="2770.2" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2770.2" y="62" text-anchor="middle" class="chart-label">83</text><text x="2770.2" y="108" text-anchor="middle" class="chart-time">05:42:03 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-84-Ask_HN')" data-target-id="row-84-Ask_HN"><title>Index: 84
+Title: Ask HN: Are third party gguf/mmproj safe on Llama in production env
+Age: 54 minutes ago
+Date: 2026-08-11T17:41:45 1786470105</title><line x1="2803.1" y1="82" x2="2803.1" y2="92" class="chart-tick" /><circle cx="2803.1" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2803.1" y="62" text-anchor="middle" class="chart-label">84</text><text x="2803.1" y="108" text-anchor="middle" class="chart-time">05:41:45 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-85-A_comp')" data-target-id="row-85-A_comp"><title>Index: 85
+Title: A compiler that turns a day at my computer into agent memory, no LLM (github.com/nossa-y)
+Age: 55 minutes ago
+Date: 2026-08-11T17:41:06 1786470066</title><line x1="2836.1" y1="82" x2="2836.1" y2="92" class="chart-tick" /><circle cx="2836.1" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2836.1" y="62" text-anchor="middle" class="chart-label">85</text><text x="2836.1" y="108" text-anchor="middle" class="chart-time">05:41:06 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-86-Termin')" data-target-id="row-86-Termin"><title>Index: 86
+Title: Terminal Browser (terminal-browser.com)
+Age: 55 minutes ago
+Date: 2026-08-11T17:40:54 1786470054</title><line x1="2869.0" y1="82" x2="2869.0" y2="92" class="chart-tick" /><circle cx="2869.0" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2869.0" y="62" text-anchor="middle" class="chart-label">86</text><text x="2869.0" y="108" text-anchor="middle" class="chart-time">05:40:54 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-87-Tradec')" data-target-id="row-87-Tradec"><title>Index: 87
+Title: Tradecraft: A portable format for context about detections (github.com/spectrum-sec)
+Age: 56 minutes ago
+Date: 2026-08-11T17:40:19 1786470019</title><line x1="2901.9" y1="82" x2="2901.9" y2="92" class="chart-tick" /><circle cx="2901.9" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2901.9" y="62" text-anchor="middle" class="chart-label">87</text><text x="2901.9" y="108" text-anchor="middle" class="chart-time">05:40:19 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-88-Linux_')" data-target-id="row-88-Linux_"><title>Index: 88
+Title: Linux desktop use surged to 22% on one workday, Cloudflare data shows (zdnet.com)
+Age: 57 minutes ago
+Date: 2026-08-11T17:39:13 1786469953</title><line x1="2934.8" y1="82" x2="2934.8" y2="92" class="chart-tick" /><circle cx="2934.8" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2934.8" y="62" text-anchor="middle" class="chart-label">88</text><text x="2934.8" y="108" text-anchor="middle" class="chart-time">05:39:13 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-89-Coffee')" data-target-id="row-89-Coffee"><title>Index: 89
+Title: Coffee Camp cattle farmer plants 14,000 trees for flood mitigation (abc.net.au)
+Age: 57 minutes ago
+Date: 2026-08-11T17:39:02 1786469942</title><line x1="2967.8" y1="82" x2="2967.8" y2="92" class="chart-tick" /><circle cx="2967.8" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="2967.8" y="62" text-anchor="middle" class="chart-label">89</text><text x="2967.8" y="108" text-anchor="middle" class="chart-time">05:39:02 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-90-Possib')" data-target-id="row-90-Possib"><title>Index: 90
+Title: Possibly Resolving a Conjecture on Matrix Theory with GPT Sol (chillphysicsenjoyer.substack.com)
+Age: 58 minutes ago
+Date: 2026-08-11T17:37:29 1786469849</title><line x1="3000.7" y1="82" x2="3000.7" y2="92" class="chart-tick" /><circle cx="3000.7" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="3000.7" y="62" text-anchor="middle" class="chart-label">90</text><text x="3000.7" y="108" text-anchor="middle" class="chart-time">05:37:29 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-91-Spotif')" data-target-id="row-91-Spotif"><title>Index: 91
+Title: Spotify to Label AI &#39;Artists&#39; (theguardian.com)
+Age: 59 minutes ago
+Date: 2026-08-11T17:36:31 1786469791</title><line x1="3033.6" y1="82" x2="3033.6" y2="92" class="chart-tick" /><circle cx="3033.6" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="3033.6" y="62" text-anchor="middle" class="chart-label">91</text><text x="3033.6" y="108" text-anchor="middle" class="chart-time">05:36:31 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-92-Sphere')" data-target-id="row-92-Sphere"><title>Index: 92
+Title: Sphere packing, AI, and mathematical beauty (empirical.health)
+Age: 1 hour ago
+Date: 2026-08-11T17:36:17 1786469777</title><line x1="3066.6" y1="82" x2="3066.6" y2="92" class="chart-tick" /><circle cx="3066.6" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="3066.6" y="62" text-anchor="middle" class="chart-label">92</text><text x="3066.6" y="108" text-anchor="middle" class="chart-time">05:36:17 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-93-Handin')" data-target-id="row-93-Handin"><title>Index: 93
+Title: Handing Out My Resume in Person (pretendtypewriter.net)
+Age: 1 hour ago
+Date: 2026-08-11T17:34:12 1786469652</title><line x1="3099.5" y1="82" x2="3099.5" y2="92" class="chart-tick" /><circle cx="3099.5" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="3099.5" y="62" text-anchor="middle" class="chart-label">93</text><text x="3099.5" y="108" text-anchor="middle" class="chart-time">05:34:12 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-94-Sopcos')" data-target-id="row-94-Sopcos"><title>Index: 94
+Title: Sopcos Protocol Based Liability Attribution in Semi-Autonomous Industrial System (zenodo.org)
+Age: 1 hour ago
+Date: 2026-08-11T17:33:54 1786469634</title><line x1="3132.4" y1="82" x2="3132.4" y2="92" class="chart-tick" /><circle cx="3132.4" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="3132.4" y="62" text-anchor="middle" class="chart-label">94</text><text x="3132.4" y="108" text-anchor="middle" class="chart-time">05:33:54 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-95-The_Pa')" data-target-id="row-95-The_Pa"><title>Index: 95
+Title: The Path to Recursive Self-Improving Agents (github.com/d2i-ai)
+Age: 1 hour ago
+Date: 2026-08-11T17:33:45 1786469625</title><line x1="3165.4" y1="82" x2="3165.4" y2="92" class="chart-tick" /><circle cx="3165.4" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="3165.4" y="62" text-anchor="middle" class="chart-label">95</text><text x="3165.4" y="108" text-anchor="middle" class="chart-time">05:33:45 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-96-July_s')" data-target-id="row-96-July_s"><title>Index: 96
+Title: July&#39;s Heat Dome Put DR on the Front Lines with One of Our Biggest Event Weeks (uplight.com)
+Age: 1 hour ago
+Date: 2026-08-11T17:33:26 1786469606</title><line x1="3198.3" y1="82" x2="3198.3" y2="92" class="chart-tick" /><circle cx="3198.3" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="3198.3" y="62" text-anchor="middle" class="chart-label">96</text><text x="3198.3" y="108" text-anchor="middle" class="chart-time">05:33:26 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-97-After_')" data-target-id="row-97-After_"><title>Index: 97
+Title: After the IDE [video] (youtube.com)
+Age: 1 hour ago
+Date: 2026-08-11T17:32:37 1786469557</title><line x1="3231.2" y1="82" x2="3231.2" y2="92" class="chart-tick" /><circle cx="3231.2" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="3231.2" y="62" text-anchor="middle" class="chart-label">97</text><text x="3231.2" y="108" text-anchor="middle" class="chart-time">05:32:37 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-98-Ask_HN')" data-target-id="row-98-Ask_HN"><title>Index: 98
+Title: Ask HN: What email provider do you recommend for personal email?
+Age: 1 hour ago
+Date: 2026-08-11T17:32:32 1786469552</title><line x1="3264.1" y1="82" x2="3264.1" y2="92" class="chart-tick" /><circle cx="3264.1" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="3264.1" y="62" text-anchor="middle" class="chart-label">98</text><text x="3264.1" y="108" text-anchor="middle" class="chart-time">05:32:32 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-99-Show_H')" data-target-id="row-99-Show_H"><title>Index: 99
+Title: Show HN: Chopi, a macOS filesystem+network sandbox to unleash your agents (github.com/danra)
+Age: 1 hour ago
+Date: 2026-08-11T17:30:46 1786469446</title><line x1="3297.1" y1="82" x2="3297.1" y2="92" class="chart-tick" /><circle cx="3297.1" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="3297.1" y="62" text-anchor="middle" class="chart-label">99</text><text x="3297.1" y="108" text-anchor="middle" class="chart-time">05:30:46 PM</text></g>
+<g class="chart-node" onclick="scrollToRow('row-100-Our_pu')" data-target-id="row-100-Our_pu"><title>Index: 100
+Title: Our puzzle generator lied about difficulty. Twice
+Age: 1 hour ago
+Date: 2026-08-11T17:29:11 1786469351</title><line x1="3330.0" y1="82" x2="3330.0" y2="92" class="chart-tick" /><circle cx="3330.0" cy="58" r="12" fill="#4caf50" stroke="#121212" stroke-width="3" /><text x="3330.0" y="62" text-anchor="middle" class="chart-label">100</text><text x="3330.0" y="108" text-anchor="middle" class="chart-time">05:29:11 PM</text></g></svg>
+      </div>
+    </section>
+    <section class="scrollable-table-area">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>(Index)</th>
+              <th>Age Text</th>
+              <th>Title Text</th>
+              <th>Title Date</th>
+              <th>Elapsed</th>
+              <th>Status</th>
+              <th>Link Cell</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="row-1-Apple_"><td>1</td><td>3 minutes ago</td><td class="title-cell">Apple Executive in Charge of Pay and Wallet Services Is Leaving (yahoo.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:33:16 1786473196</td><td>3m</td><td class="status-pass">PASS</td><td><a href="https://finance.yahoo.com/technology/articles/apple-executive-charge-pay-wallet-174854341.html" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-2-Appeti"><td>2</td><td>3 minutes ago</td><td class="title-cell">Appetite-suppressing hormone may protect liver from inflammation (medicalxpress.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:33:08 1786473188</td><td>3m</td><td class="status-pass">PASS</td><td><a href="https://medicalxpress.com/news/2026-08-appetite-suppressing-hormone-liver-inflammation.html" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-3-FieldF"><td>3</td><td>3 minutes ago</td><td class="title-cell">FieldFleet – self-hostable field operations built with Flutter and Supabase (taskfleetai.github.io)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:33:07 1786473187</td><td>3m</td><td class="status-pass">PASS</td><td><a href="https://taskfleetai.github.io/fieldfleet/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-4-When_s"><td>4</td><td>3 minutes ago</td><td class="title-cell">When&#39;s the next model coming out? (modelrumor.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:32:28 1786473148</td><td>3m</td><td class="status-pass">PASS</td><td><a href="https://modelrumor.com/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-5-URLs_a"><td>5</td><td>5 minutes ago</td><td class="title-cell">URLs aren&#39;t strings, and my recent encounter with this (utcc.utoronto.ca)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:31:10 1786473070</td><td>5m</td><td class="status-pass">PASS</td><td><a href="https://utcc.utoronto.ca/~cks/space/blog/web/URLsAreNotStringsMyCase" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-6-Nobody"><td>6</td><td>5 minutes ago</td><td class="title-cell">Nobody is going to tell you your website is bad (cooked-phi-pink.vercel.app)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:31:05 1786473065</td><td>5m</td><td class="status-pass">PASS</td><td><a href="https://cooked-phi-pink.vercel.app/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-7-What_s"><td>7</td><td>7 minutes ago</td><td class="title-cell">What&#39;s the most memory-efficient way to check the weather forecast? (manualdousuario.net)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:29:03 1786472943</td><td>7m</td><td class="status-pass">PASS</td><td><a href="https://manualdousuario.net/en/weather-forecast-windows-11-ram/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-8-Show_H"><td>8</td><td>7 minutes ago</td><td class="title-cell">Show HN: NotebookLM Calibre Plugin (github.com/divyenduz)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:28:30 1786472910</td><td>7m</td><td class="status-pass">PASS</td><td><a href="https://github.com/divyenduz/notebooklm-calibre-plugin" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-9-Declar"><td>9</td><td>8 minutes ago</td><td class="title-cell">Declarative Canvas UI for the browser, inspired by Swift (romanuk.org)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:27:42 1786472862</td><td>8m</td><td class="status-pass">PASS</td><td><a href="https://romanuk.org/declarative-canvas-ui-for-the-browser-inspired-by-swift/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-10-Vitami"><td>10</td><td>9 minutes ago</td><td class="title-cell">Vitamin D regulates &gt;5% of the human genome (empirical.health)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:27:16 1786472836</td><td>9m</td><td class="status-pass">PASS</td><td><a href="https://www.empirical.health/blog/vitamin-d-genome-regulation/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-11-Three_"><td>11</td><td>9 minutes ago</td><td class="title-cell">Three hour notice: congressional report incoming</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:26:35 1786472795</td><td>9m</td><td class="status-pass">PASS</td><td><a href="https://news.ycombinator.com/item?id=49262448" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-12-Unslot"><td>12</td><td>10 minutes ago</td><td class="title-cell">Unsloth Desktop: Open-Source App for Local Models (github.com/unslothai)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:25:50 1786472750</td><td>10m</td><td class="status-pass">PASS</td><td><a href="https://github.com/unslothai/unsloth" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-13-FreeHo"><td>13</td><td>11 minutes ago</td><td class="title-cell">FreeHosts – A community-curated directory of free hosting providers (freehosts.eu)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:24:52 1786472692</td><td>11m</td><td class="status-pass">PASS</td><td><a href="https://freehosts.eu/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-14-The_Gr"><td>14</td><td>11 minutes ago</td><td class="title-cell">The Great Copper Crunch: Why the Next Bull Run Is Just Getting Started (prinsights.substack.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:24:24 1786472664</td><td>11m</td><td class="status-pass">PASS</td><td><a href="https://prinsights.substack.com/p/the-great-copper-crunch-why-the-next" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-15-P____A"><td>15</td><td>12 minutes ago</td><td class="title-cell">P/ – A simple and clear programming language</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:23:27 1786472607</td><td>12m</td><td class="status-pass">PASS</td><td><a href="https://news.ycombinator.com/item?id=49262401" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-16-Ask_HN"><td>16</td><td>13 minutes ago</td><td class="title-cell">Ask HN: How much Adderall do you use?</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:22:36 1786472556</td><td>13m</td><td class="status-pass">PASS</td><td><a href="https://news.ycombinator.com/item?id=49262388" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-17-Unders"><td>17</td><td>13 minutes ago</td><td class="title-cell">Understanding an AI agent&#39;s memory through Harry Potter (squidler.io)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:22:26 1786472546</td><td>13m</td><td class="status-pass">PASS</td><td><a href="https://squidler.io/blog/agent-memory-harry-potter" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-18-My_hom"><td>18</td><td>14 minutes ago</td><td class="title-cell">My home internet died for half a day. So did every agent I had (bostrat.ai)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:21:26 1786472486</td><td>14m</td><td class="status-pass">PASS</td><td><a href="https://bostrat.ai/blog/the-outage" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-19-Fedora"><td>19</td><td>16 minutes ago</td><td class="title-cell">Fedora CoreOS to Enable Systemd-Oomd and ZRAM Swap by Default (phoronix.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:20:11 1786472411</td><td>16m</td><td class="status-pass">PASS</td><td><a href="https://www.phoronix.com/news/Fedora-CoreOS-OOMD-zRAM-Swap" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-20-Ask_HN"><td>20</td><td>16 minutes ago</td><td class="title-cell">Ask HN: When should you open-source your solution and why?</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:20:03 1786472403</td><td>16m</td><td class="status-pass">PASS</td><td><a href="https://news.ycombinator.com/item?id=49262352" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-21-TDD_in"><td>21</td><td>16 minutes ago</td><td class="title-cell">TDD inside the agent loop – theater or actual value? (martinfowler.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:19:51 1786472391</td><td>16m</td><td class="status-pass">PASS</td><td><a href="https://martinfowler.com/articles/exploring-gen-ai/tdd-in-the-agent-loop.html" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-22-Show_H"><td>22</td><td>17 minutes ago</td><td class="title-cell">Show HN: HyperSAE – Hyperbolic Sparse Autoencoders for LLM Interpretability (github.com/vishal-dehurdle)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:19:02 1786472342</td><td>17m</td><td class="status-pass">PASS</td><td><a href="https://github.com/vishal-dehurdle/hypersae" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-23-LTX_2_"><td>23</td><td>17 minutes ago</td><td class="title-cell">LTX 2.5 a stronger foundation for what&#39;s being built (ltx.io)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:18:43 1786472323</td><td>17m</td><td class="status-pass">PASS</td><td><a href="https://ltx.io/model/ltx-2-5" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-24-Ask_HN"><td>24</td><td>19 minutes ago</td><td class="title-cell">Ask HN: How do you keep 54 LLM workflows on the right models?</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:17:16 1786472236</td><td>19m</td><td class="status-pass">PASS</td><td><a href="https://news.ycombinator.com/item?id=49262312" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-25-OpenAI"><td>25</td><td>21 minutes ago</td><td class="title-cell">OpenAI&#39;s head of ethics leaves startup less than one year after joining (ft.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:15:03 1786472103</td><td>21m</td><td class="status-pass">PASS</td><td><a href="https://www.ft.com/content/e49dfb75-f841-4466-a577-f7aaff8779a0" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-26-A_Prel"><td>26</td><td>23 minutes ago</td><td class="title-cell">A Preliminary Study on Simultaneous Coscheduling for Discrete GPU vs. Fused GPU (arxiv.org)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:12:44 1786471964</td><td>23m</td><td class="status-pass">PASS</td><td><a href="https://arxiv.org/abs/2608.09647" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-27-Show_H"><td>27</td><td>23 minutes ago</td><td class="title-cell">Show HN: SmokeOps – describe a flow, get checks you rerun without AI (github.com/gate3)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:12:40 1786471960</td><td>23m</td><td class="status-pass">PASS</td><td><a href="https://github.com/gate3/SmokeOps" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-28-Imprin"><td>28</td><td>24 minutes ago</td><td class="title-cell">Imprint – Fine-tune MoE LLMs bigger than your RAM (github.com/sigma0101111)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:11:52 1786471912</td><td>24m</td><td class="status-pass">PASS</td><td><a href="https://github.com/sigma0101111/imprint" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-29-Sam_s_"><td>29</td><td>26 minutes ago</td><td class="title-cell">Sam&#39;s News – Free AI News Aggregator (samnews.news)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:10:12 1786471812</td><td>26m</td><td class="status-pass">PASS</td><td><a href="https://samnews.news/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-30-We_Use"><td>30</td><td>26 minutes ago</td><td class="title-cell">We Used to Get Jobs (ironicsans.ghost.io)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:09:56 1786471796</td><td>26m</td><td class="status-pass">PASS</td><td><a href="https://ironicsans.ghost.io/how-we-used-to-get-jobs/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-31-Nvidia"><td>31</td><td>26 minutes ago</td><td class="title-cell">Nvidia building 1T-parameter Nemotron 4 to rival open AI models (reuters.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:09:46 1786471786</td><td>26m</td><td class="status-pass">PASS</td><td><a href="https://www.reuters.com/business/nvidia-is-developing-nemotron-4-open-source-models-information-reports-2026-08-11" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-32-Cynthi"><td>32</td><td>27 minutes ago</td><td class="title-cell">Cynthion: Open-source USB test instrument (greatscottgadgets.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:09:13 1786471753</td><td>27m</td><td class="status-pass">PASS</td><td><a href="https://greatscottgadgets.com/cynthion/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-33-Elon_M"><td>33</td><td>28 minutes ago</td><td class="title-cell">Elon Musk ran a decoy super PAC to compare Trump with RGB (google.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:07:39 1786471659</td><td>28m</td><td class="status-pass">PASS</td><td><a href="https://www.google.com/search?q=rgb+pac+elon+musk" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-34-The_wo"><td>34</td><td>29 minutes ago</td><td class="title-cell">The worst part of using multiple LLM providers is not the API differences (github.com/maximhq)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:07:13 1786471633</td><td>29m</td><td class="status-pass">PASS</td><td><a href="https://github.com/maximhq/bifrost" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-35-A_bug_"><td>35</td><td>29 minutes ago</td><td class="title-cell">A bug becoming a feature (1972 edition) (aresluna.org)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:07:03 1786471623</td><td>29m</td><td class="status-pass">PASS</td><td><a href="https://unsung.aresluna.org/a-bug-becoming-a-feature-1972-edition/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-36-Ethica"><td>36</td><td>29 minutes ago</td><td class="title-cell">Ethical Cold Outreach (val.town)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:06:55 1786471615</td><td>29m</td><td class="status-pass">PASS</td><td><a href="https://blog.val.town/ethical-cold-outreach" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-37-Report"><td>37</td><td>29 minutes ago</td><td class="title-cell">Report from the Security Mines (val.town)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:06:45 1786471605</td><td>29m</td><td class="status-pass">PASS</td><td><a href="https://blog.val.town/security" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-38-Docfoo"><td>38</td><td>29 minutes ago</td><td class="title-cell">Docfooding: Eating Our Own Documentation (val.town)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:06:34 1786471594</td><td>29m</td><td class="status-pass">PASS</td><td><a href="https://blog.val.town/docfooding" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-39-Hack_s"><td>39</td><td>30 minutes ago</td><td class="title-cell">Hack&#39;s Law (wikipedia.org)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:06:21 1786471581</td><td>30m</td><td class="status-pass">PASS</td><td><a href="https://en.wikipedia.org/wiki/Hack%27s_law" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-40-Would_"><td>40</td><td>31 minutes ago</td><td class="title-cell">Would Appreciate Any Feedback (deskfellow.app)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:04:42 1786471482</td><td>31m</td><td class="status-pass">PASS</td><td><a href="https://deskfellow.app/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-41-ChatGP"><td>41</td><td>32 minutes ago</td><td class="title-cell">ChatGPT Desktop App for Linux (twitter.com/openai)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:03:56 1786471436</td><td>32m</td><td class="status-pass">PASS</td><td><a href="https://twitter.com/OpenAI/status/2087231350134980830" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-42-Why_Ar"><td>42</td><td>33 minutes ago</td><td class="title-cell">Why Are Rivers So Mathematical? (quantamagazine.org)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:02:46 1786471366</td><td>33m</td><td class="status-pass">PASS</td><td><a href="https://www.quantamagazine.org/why-are-rivers-so-mathematical-20260810/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-43-_2_1__"><td>43</td><td>33 minutes ago</td><td class="title-cell">(2,1)-C1P is NP-complete (zenodo.org)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:02:28 1786471348</td><td>33m</td><td class="status-pass">PASS</td><td><a href="https://zenodo.org/records/21871667" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-44-Inacce"><td>44</td><td>34 minutes ago</td><td class="title-cell">Inaccessible .bnnsir files on macOS Sequoia (lapcatsoftware.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:02:19 1786471339</td><td>34m</td><td class="status-pass">PASS</td><td><a href="https://lapcatsoftware.com/articles/2025/4/3.html" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-45-How_to"><td>45</td><td>34 minutes ago</td><td class="title-cell">How to Appreciate (how-to-appreciate.pages.dev)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:02:14 1786471334</td><td>34m</td><td class="status-pass">PASS</td><td><a href="https://how-to-appreciate.pages.dev/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-46-Hetzne"><td>46</td><td>34 minutes ago</td><td class="title-cell">Hetzner: Open Weights Inference API (hetzner.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:02:08 1786471328</td><td>34m</td><td class="status-pass">PASS</td><td><a href="https://docs.hetzner.com/general/company-and-policy/experiments/experiments-platform/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-47-Flight"><td>47</td><td>34 minutes ago</td><td class="title-cell">FlightAware sues Kalshi over flight cancellation prediction markets [pdf] (courtlistener.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:01:41 1786471301</td><td>34m</td><td class="status-pass">PASS</td><td><a href="https://storage.courtlistener.com/recap/gov.uscourts.nysd.670254/gov.uscourts.nysd.670254.1.0.pdf" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-48-Shrink"><td>48</td><td>34 minutes ago</td><td class="title-cell">Shrinking student populations cause spike in public school closures across U.S. (washingtonpost.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:01:29 1786471289</td><td>34m</td><td class="status-pass">PASS</td><td><a href="https://www.washingtonpost.com/education/2026/07/20/school-closures-rising-across-us-pools-students-funds-shrink/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-49-Termin"><td>49</td><td>35 minutes ago</td><td class="title-cell">TerminalWidget for Mac, iPhone, and iPad (terminalwidget.app)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T18:00:31 1786471231</td><td>35m</td><td class="status-pass">PASS</td><td><a href="https://terminalwidget.app/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-50-Facebo"><td>50</td><td>36 minutes ago</td><td class="title-cell">Faceboard: A Case Study in Community-Led Information Exchange (Satire) (mcsweeneys.net)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:59:54 1786471194</td><td>36m</td><td class="status-pass">PASS</td><td><a href="https://www.mcsweeneys.net/articles/faceboard-a-case-study-in-community-led-information-exchange" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-51-Provin"><td>51</td><td>37 minutes ago</td><td class="title-cell">Proving Muse Glimmer in Zero-Knowledge at 85 Tok/S on an H100 (attestable.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:58:58 1786471138</td><td>37m</td><td class="status-pass">PASS</td><td><a href="https://attestable.com/blog/proving-llms-scale" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-52-Ask_HN"><td>52</td><td>37 minutes ago</td><td class="title-cell">Ask HN: Any good alternatives to Claude that are just not Claude?</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:58:57 1786471137</td><td>37m</td><td class="status-pass">PASS</td><td><a href="https://news.ycombinator.com/item?id=49262048" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-53-Show_H"><td>53</td><td>39 minutes ago</td><td class="title-cell">Show HN: PR Nutrition, a local rule-based CLI for pull request triage (github.com/param-10)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:56:38 1786470998</td><td>39m</td><td class="status-pass">PASS</td><td><a href="https://github.com/Param-10/pr-nutrition" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-54-Show_H"><td>54</td><td>41 minutes ago</td><td class="title-cell">Show HN: TermDOM – HTML, CSS and JavaScript (With a Real DOM) for TUIs and CLIs (github.com/bikeshaving)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:55:20 1786470920</td><td>41m</td><td class="status-pass">PASS</td><td><a href="https://github.com/bikeshaving/termdom" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-55-Termin"><td>55</td><td>41 minutes ago</td><td class="title-cell">Terminal-Bench 3.0 (frontierbench.ai)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:54:54 1786470894</td><td>41m</td><td class="status-pass">PASS</td><td><a href="https://www.frontierbench.ai/announcement" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-56-Statel"><td>56</td><td>42 minutes ago</td><td class="title-cell">Stateless Servers, Stateful Payloads: Sessions vs. Continuations, Rust (dmitrii.app)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:54:20 1786470860</td><td>42m</td><td class="status-pass">PASS</td><td><a href="https://dmitrii.app/stateless-servers-stateful-payloads-sessions-vs-continuations-measured-in-rust/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-57-Coma__"><td>57</td><td>42 minutes ago</td><td class="title-cell">Coma (Continuation Machine) Intermediate Verification Language (paulpatault.fr)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:54:03 1786470843</td><td>42m</td><td class="status-pass">PASS</td><td><a href="https://coma.paulpatault.fr/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-58-Show_H"><td>58</td><td>42 minutes ago</td><td class="title-cell">Show HN: Experimentation platform for simulating agents as users (514.ax)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:53:53 1786470833</td><td>42m</td><td class="status-pass">PASS</td><td><a href="https://docs.514.ax/0.5.0-rp" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-59-Talkin"><td>59</td><td>44 minutes ago</td><td class="title-cell">Talking with Synopsys about the Physics of Chip Design at DAC 2026 (chipsandcheese.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:52:18 1786470738</td><td>44m</td><td class="status-pass">PASS</td><td><a href="https://chipsandcheese.com/p/talking-with-synopsys-about-the-physics" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-60-Ask_HN"><td>60</td><td>44 minutes ago</td><td class="title-cell">Ask HN: Ive built and open source P2P chat without back end</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:51:49 1786470709</td><td>44m</td><td class="status-pass">PASS</td><td><a href="https://news.ycombinator.com/item?id=49261928" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-61-Show_H"><td>61</td><td>44 minutes ago</td><td class="title-cell">Show HN: Hybrid memory retrieval for coding agents (github.com/yaminbakoh4-dot)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:51:35 1786470695</td><td>44m</td><td class="status-pass">PASS</td><td><a href="https://github.com/yaminbakoh4-dot/NexusMem" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-62-A_Cali"><td>62</td><td>45 minutes ago</td><td class="title-cell">A California Home That Rotates 320 Degrees Takes a Spin on the Market (wsj.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:51:06 1786470666</td><td>45m</td><td class="status-pass">PASS</td><td><a href="https://www.wsj.com/real-estate/luxury-homes/rotating-home-novato-california-998d0db9" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-63-AI_spe"><td>63</td><td>45 minutes ago</td><td class="title-cell">AI spend observability down to individual User ID&#39;s and routes (kalaa.cc)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:50:42 1786470642</td><td>45m</td><td class="status-pass">PASS</td><td><a href="https://kalaa.cc/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-64-OpenSS"><td>64</td><td>46 minutes ago</td><td class="title-cell">OpenSSH 10.5 released, AI assistice now welcome (openssh.org)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:49:37 1786470577</td><td>46m</td><td class="status-pass">PASS</td><td><a href="https://www.openssh.org/releasenotes.html#10.5" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-65-The_Pa"><td>65</td><td>47 minutes ago</td><td class="title-cell">The Pacing of the Frontier (thezvi.substack.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:48:48 1786470528</td><td>47m</td><td class="status-pass">PASS</td><td><a href="https://thezvi.substack.com/p/the-pacing-of-the-frontier" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-66-Show_H"><td>66</td><td>47 minutes ago</td><td class="title-cell">Show HN: Cjson.cpp, the new fastest-ever (constexpr) JSON parser (github.com/rfgplk)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:48:36 1786470516</td><td>47m</td><td class="status-pass">PASS</td><td><a href="https://github.com/rfgplk/cjson.cpp" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-67-The_Ho"><td>67</td><td>48 minutes ago</td><td class="title-cell">The Housing Recession Is Over (conorsen.substack.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:48:03 1786470483</td><td>48m</td><td class="status-pass">PASS</td><td><a href="https://conorsen.substack.com/p/the-housing-recession-is-over-8b6" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-68-Expire"><td>68</td><td>48 minutes ago</td><td class="title-cell">Expired DMARC endpoint exposed a NYSE Fortune 1000 infrastructure for $10 (sh.consulting)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:47:49 1786470469</td><td>48m</td><td class="status-pass">PASS</td><td><a href="https://www.sh.consulting/blog/abandoned-dmarc-reporting-domain" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-69-The_Un"><td>69</td><td>48 minutes ago</td><td class="title-cell">The Unsloth Desktop App – run and train models locally (unsloth.ai)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:47:44 1786470464</td><td>48m</td><td class="status-pass">PASS</td><td><a href="https://unsloth.ai/download/mac" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-70-Eight_"><td>70</td><td>48 minutes ago</td><td class="title-cell">Eight architecture myths BUSTED by Samuel Hughes (bensouthwood.co.uk)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:47:38 1786470458</td><td>48m</td><td class="status-pass">PASS</td><td><a href="https://www.bensouthwood.co.uk/p/eight-architecture-myths-busted-by" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-71-The_Sp"><td>71</td><td>49 minutes ago</td><td class="title-cell">The SpaceX Sham (dissentmagazine.org)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:47:03 1786470423</td><td>49m</td><td class="status-pass">PASS</td><td><a href="https://dissentmagazine.org/online_articles/spacex-ipo-elon-musk-trillionaire/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-72-TRMNL_"><td>72</td><td>50 minutes ago</td><td class="title-cell">TRMNL ePaper Design System (github.com/usetrmnl)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:46:21 1786470381</td><td>50m</td><td class="status-pass">PASS</td><td><a href="https://github.com/usetrmnl/trmnl-framework" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-73-Remove"><td>73</td><td>51 minutes ago</td><td class="title-cell">Remove Claude&#39;s Watermark (removeclaudewatermark.org)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:45:21 1786470321</td><td>51m</td><td class="status-pass">PASS</td><td><a href="https://removeclaudewatermark.org/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-74-Up_to_"><td>74</td><td>51 minutes ago</td><td class="title-cell">Up to 12.8x Improvement Observed for Gup_test with New Linux MM Patches (phoronix.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:45:13 1786470313</td><td>51m</td><td class="status-pass">PASS</td><td><a href="https://www.phoronix.com/news/Linux-Batch-Follow-Page-Mask" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-75-Flatpa"><td>75</td><td>51 minutes ago</td><td class="title-cell">Flatpak 1.19 Released with Nine Security Fixes (phoronix.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:44:51 1786470291</td><td>51m</td><td class="status-pass">PASS</td><td><a href="https://www.phoronix.com/news/Flatpak-1.19-Released" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-76-Analyz"><td>76</td><td>51 minutes ago</td><td class="title-cell">Analyzing Fedora&#39;s Slow Performance on the Framework Laptop 13 Pro (phoronix.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:44:30 1786470270</td><td>51m</td><td class="status-pass">PASS</td><td><a href="https://www.phoronix.com/review/fedora-pantherlake-thermald-tuned" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-77-Rant_H"><td>77</td><td>51 minutes ago</td><td class="title-cell">Rant/Help Google auto-account bans are insane (accounts.google.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:44:25 1786470265</td><td>51m</td><td class="status-pass">PASS</td><td><a href="https://accounts.google.com/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-78-China_"><td>78</td><td>52 minutes ago</td><td class="title-cell">China warns of &quot;security backdoor&quot; in Anthropic AI coding tool [July 8, 2026] (cbsnews.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:43:55 1786470235</td><td>52m</td><td class="status-pass">PASS</td><td><a href="https://www.cbsnews.com/news/china-security-backdoor-anthropic-ai-coding-tool/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-79-Deep_d"><td>79</td><td>52 minutes ago</td><td class="title-cell">Deep-diff NPM JavaScript library lost reference documentation (github.com/therohk)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:43:36 1786470216</td><td>52m</td><td class="status-pass">PASS</td><td><a href="https://github.com/therohk/datum-merge/blob/main/src/diff-lib/dd-README.md" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-80-Ask_HN"><td>80</td><td>53 minutes ago</td><td class="title-cell">Ask HN: What are your thoughts on E2E software development using AI agents?</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:43:11 1786470191</td><td>53m</td><td class="status-pass">PASS</td><td><a href="https://news.ycombinator.com/item?id=49261790" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-81-Phone_"><td>81</td><td>53 minutes ago</td><td class="title-cell">Phone tracking adding to license plate readers, associating devices with cars (techxplore.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:42:39 1786470159</td><td>53m</td><td class="status-pass">PASS</td><td><a href="https://techxplore.com/news/2026-08-tech-tracking-plate-readers-associating.html" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-82-Moving"><td>82</td><td>54 minutes ago</td><td class="title-cell">Moving integer division to floating-point is trivial (marc-b-reynolds.github.io)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:42:04 1786470124</td><td>54m</td><td class="status-pass">PASS</td><td><a href="http://marc-b-reynolds.github.io/math/2026/08/10/IntDivByFP.html" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-83-Experi"><td>83</td><td>54 minutes ago</td><td class="title-cell">Experience of Running Muse Glimmer on Mac (holaclaw.ai)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:42:03 1786470123</td><td>54m</td><td class="status-pass">PASS</td><td><a href="https://holaclaw.ai/blog/muse-glimmer-on-mac" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-84-Ask_HN"><td>84</td><td>54 minutes ago</td><td class="title-cell">Ask HN: Are third party gguf/mmproj safe on Llama in production env</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:41:45 1786470105</td><td>54m</td><td class="status-pass">PASS</td><td><a href="https://news.ycombinator.com/item?id=49261767" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-85-A_comp"><td>85</td><td>55 minutes ago</td><td class="title-cell">A compiler that turns a day at my computer into agent memory, no LLM (github.com/nossa-y)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:41:06 1786470066</td><td>55m</td><td class="status-pass">PASS</td><td><a href="https://github.com/nossa-y/activity-frames" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-86-Termin"><td>86</td><td>55 minutes ago</td><td class="title-cell">Terminal Browser (terminal-browser.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:40:54 1786470054</td><td>55m</td><td class="status-pass">PASS</td><td><a href="https://terminal-browser.com/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-87-Tradec"><td>87</td><td>56 minutes ago</td><td class="title-cell">Tradecraft: A portable format for context about detections (github.com/spectrum-sec)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:40:19 1786470019</td><td>56m</td><td class="status-pass">PASS</td><td><a href="https://github.com/spectrum-sec/delta-tradecraft" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-88-Linux_"><td>88</td><td>57 minutes ago</td><td class="title-cell">Linux desktop use surged to 22% on one workday, Cloudflare data shows (zdnet.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:39:13 1786469953</td><td>57m</td><td class="status-pass">PASS</td><td><a href="https://www.zdnet.com/article/linux-desktop-use-surged-on-one-workday-cloudflare-data-shows/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-89-Coffee"><td>89</td><td>57 minutes ago</td><td class="title-cell">Coffee Camp cattle farmer plants 14,000 trees for flood mitigation (abc.net.au)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:39:02 1786469942</td><td>57m</td><td class="status-pass">PASS</td><td><a href="https://www.abc.net.au/news/2026-07-10/nature-based-solutions-flooding/106844226" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-90-Possib"><td>90</td><td>58 minutes ago</td><td class="title-cell">Possibly Resolving a Conjecture on Matrix Theory with GPT Sol (chillphysicsenjoyer.substack.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:37:29 1786469849</td><td>58m</td><td class="status-pass">PASS</td><td><a href="https://chillphysicsenjoyer.substack.com/p/i-possibly-resolved-a-conjecture" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-91-Spotif"><td>91</td><td>59 minutes ago</td><td class="title-cell">Spotify to Label AI &#39;Artists&#39; (theguardian.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:36:31 1786469791</td><td>59m</td><td class="status-pass">PASS</td><td><a href="https://www.theguardian.com/technology/2026/aug/11/spotify-label-ai-artists-block-them-from-some-playlists" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-92-Sphere"><td>92</td><td>1 hour ago</td><td class="title-cell">Sphere packing, AI, and mathematical beauty (empirical.health)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:36:17 1786469777</td><td>60m</td><td class="status-pass">PASS</td><td><a href="https://www.empirical.health/blog/ai-math-sphere-packing/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-93-Handin"><td>93</td><td>1 hour ago</td><td class="title-cell">Handing Out My Resume in Person (pretendtypewriter.net)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:34:12 1786469652</td><td>60m</td><td class="status-pass">PASS</td><td><a href="https://pretendtypewriter.net/handing-out-my-resume-in-person/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-94-Sopcos"><td>94</td><td>1 hour ago</td><td class="title-cell">Sopcos Protocol Based Liability Attribution in Semi-Autonomous Industrial System (zenodo.org)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:33:54 1786469634</td><td>60m</td><td class="status-pass">PASS</td><td><a href="https://zenodo.org/records/19359701" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-95-The_Pa"><td>95</td><td>1 hour ago</td><td class="title-cell">The Path to Recursive Self-Improving Agents (github.com/d2i-ai)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:33:45 1786469625</td><td>60m</td><td class="status-pass">PASS</td><td><a href="https://github.com/D2I-ai/awesome-recursive-self-improving-agents" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-96-July_s"><td>96</td><td>1 hour ago</td><td class="title-cell">July&#39;s Heat Dome Put DR on the Front Lines with One of Our Biggest Event Weeks (uplight.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:33:26 1786469606</td><td>60m</td><td class="status-pass">PASS</td><td><a href="https://uplight.com/blog/julys-heat-dome-put-dr-on-the-front-lines-with-one-of-our-biggest-event-weeks-to-date/" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-97-After_"><td>97</td><td>1 hour ago</td><td class="title-cell">After the IDE [video] (youtube.com)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:32:37 1786469557</td><td>60m</td><td class="status-pass">PASS</td><td><a href="https://www.youtube.com/watch?v=bvwE9XpNXOI" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-98-Ask_HN"><td>98</td><td>1 hour ago</td><td class="title-cell">Ask HN: What email provider do you recommend for personal email?</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:32:32 1786469552</td><td>60m</td><td class="status-pass">PASS</td><td><a href="https://news.ycombinator.com/item?id=49261634" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-99-Show_H"><td>99</td><td>1 hour ago</td><td class="title-cell">Show HN: Chopi, a macOS filesystem+network sandbox to unleash your agents (github.com/danra)</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:30:46 1786469446</td><td>60m</td><td class="status-pass">PASS</td><td><a href="https://github.com/danra/chopi" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+<tr id="row-100-Our_pu"><td>100</td><td>1 hour ago</td><td class="title-cell">Our puzzle generator lied about difficulty. Twice</td><td style="font-family: monospace; color: #aaa;">2026-08-11T17:29:11 1786469351</td><td>60m</td><td class="status-pass">PASS</td><td><a href="https://news.ycombinator.com/item?id=49261591" target="_blank" rel="noopener noreferrer" class="row-link">Open Link</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script>
+    function scrollToRow(rowId) {
+      var targetRow = document.getElementById(rowId);
+      if (!targetRow) return;
+
+      var navItems = document.querySelectorAll('.test-item');
+      for (var i = 0; i < navItems.length; i++) {
+        navItems[i].classList.remove('active');
+      }
+      var activeNav = document.getElementById('nav-item-' + rowId);
+      if (activeNav) {
+        activeNav.classList.add('active');
+        activeNav.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      var chartNodes = document.querySelectorAll('.chart-node');
+      for (var j = 0; j < chartNodes.length; j++) {
+        chartNodes[j].classList.remove('active');
+      }
+      var activeNode = document.querySelector('.chart-node[data-target-id="' + rowId + '"]');
+      if (activeNode) {
+        activeNode.classList.add('active');
+        activeNode.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+
+      var rows = document.querySelectorAll('tbody tr');
+      for (var k = 0; k < rows.length; k++) {
+        rows[k].classList.remove('highlighted-row');
+      }
+      targetRow.classList.add('highlighted-row');
+      targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  </script>
+</body>
+</html>

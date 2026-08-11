@@ -1,0 +1,44 @@
+
+========================================================================
+QA Wolf Project Setup Check
+========================================================================
+Timestamp: 2026-08-11T18:36:14.592Z
+Project root: C:\Users\zaksk\Downloads\QA_Wolf_Take_Home(Final)\QA_Wolf_Take_Home(Final)\qa_wolf_take_home
+Daily output folder: C:\Users\zaksk\Downloads\QA_Wolf_Take_Home(Final)\QA_Wolf_Take_Home(Final)\qa_wolf_take_home\build\2026-08-11
+
+========================================================================
+Runtime
+========================================================================
+Platform: win32
+Architecture: x64
+OS release: 10.0.26200
+Docker/container: no
+PLAYWRIGHT_BROWSERS_PATH: (not set)
+
+========================================================================
+Node And npm
+========================================================================
+Node executable: C:\Program Files\nodejs\node.exe
+Node version: v24.19.0 OK
+npm version: 11.17.0
+
+========================================================================
+Playwright Package
+========================================================================
+Playwright package source: local node_modules
+Playwright package path: C:\Users\zaksk\Downloads\QA_Wolf_Take_Home(Final)\QA_Wolf_Take_Home(Final)\qa_wolf_take_home\node_modules\playwright\package.json
+Playwright package version: 1.62.1
+Playwright npm version: 1.62.1
+
+========================================================================
+Playwright Browsers
+========================================================================
+chromium: found C:\Users\zaksk\AppData\Local\ms-playwright\chromium-1234\chrome-win64\chrome.exe
+firefox: found C:\Users\zaksk\AppData\Local\ms-playwright\firefox-1538\firefox\firefox.exe
+webkit: found C:\Users\zaksk\AppData\Local\ms-playwright\webkit-2336\Playwright.exe
+
+========================================================================
+Result
+========================================================================
+Setup log written to: C:\Users\zaksk\Downloads\QA_Wolf_Take_Home(Final)\QA_Wolf_Take_Home(Final)\qa_wolf_take_home\build\2026-08-11\setup.log
+Setup details appended to: C:\Users\zaksk\Downloads\QA_Wolf_Take_Home(Final)\QA_Wolf_Take_Home(Final)\qa_wolf_take_home\build\2026-08-11\output.log

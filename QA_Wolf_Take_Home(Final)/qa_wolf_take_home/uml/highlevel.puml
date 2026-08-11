@@ -1,0 +1,70 @@
+@startuml
+' High level architecture for QA Wolf Take Home
+skinparam packageStyle rectangle
+skinparam componentStyle uml2
+
+package "Application" {
+  [index.js] <<Node>>
+  [setup.js] <<Node>>
+  [config.js] <<Node>>
+}
+
+package "Support Modules" {
+  [utilities.js] <<Node>>
+  [html-report-generator.js] <<Node>>
+  [logging.js] <<Node>>
+}
+
+package "Management" {
+  [management/manage_project.ps1] <<Batch>>
+  [management/manage_project.bat] <<Batch>>
+  [management/manage_project.sh] <<Shell>>
+}
+
+package "Tests" {
+  [test/sort.test.js] <<Test>>
+  [test/setup.more.test.js] <<Test>>
+  [test/runpaths.test.js] <<Test>>
+}
+
+[management/manage_project.ps1] ..> [index.js] : operates on project root
+[management/manage_project.bat] ..> [index.js] : operates on project root
+[management/manage_project.sh] ..> [index.js] : operates on project root
+
+[index.js] --> [setup.js] : run setup validations
+[index.js] --> [config.js] : get daily run paths + settings
+[index.js] --> [utilities.js] : Data / Camera / Table / Terminal
+[index.js] --> [html-report-generator.js] : write HTML report
+
+[setup.js] --> [config.js] : build dir / run path helpers
+[setup.js] --> [logging.js] : centralized console logging
+
+[utilities.js] --> [config.js] : resolve screenshot + build folder
+[utilities.js] --> [logging.js] : output data and tables
+[html-report-generator.js] --> [logging.js] : log report generation
+
+[test/sort.test.js] --> [utilities.js] : validate data helpers
+[test/sort.test.js] --> [setup.js] : verify setup behavior
+[test/setup.more.test.js] --> [setup.js] : validate recovery flows
+[test/runpaths.test.js] --> [config.js] : validate daily folder logic
+
+note right of [config.js]
+  - dailyDir
+  - runId
+  - screenshotsDir
+  - outputLogPath
+  - setupLogPath
+  - reportPath
+  - testHeadless
+end note
+
+note left of [logging.js]
+  - log()
+  - warn()
+  - error()
+  - table()
+  - getLines()
+  - clearLines()
+end note
+
+@enduml

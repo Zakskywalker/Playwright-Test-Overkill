@@ -1,0 +1,155 @@
+
+--- Setup Instructions / Environment Check ---
+
+========================================================================
+QA Wolf Project Setup Check
+========================================================================
+Timestamp: 2026-08-11T18:36:14.592Z
+Project root: C:\Users\zaksk\Downloads\QA_Wolf_Take_Home(Final)\QA_Wolf_Take_Home(Final)\qa_wolf_take_home
+Daily output folder: C:\Users\zaksk\Downloads\QA_Wolf_Take_Home(Final)\QA_Wolf_Take_Home(Final)\qa_wolf_take_home\build\2026-08-11
+
+========================================================================
+Runtime
+========================================================================
+Platform: win32
+Architecture: x64
+OS release: 10.0.26200
+Docker/container: no
+PLAYWRIGHT_BROWSERS_PATH: (not set)
+
+========================================================================
+Node And npm
+========================================================================
+Node executable: C:\Program Files\nodejs\node.exe
+Node version: v24.19.0 OK
+npm version: 11.17.0
+
+========================================================================
+Playwright Package
+========================================================================
+Playwright package source: local node_modules
+Playwright package path: C:\Users\zaksk\Downloads\QA_Wolf_Take_Home(Final)\QA_Wolf_Take_Home(Final)\qa_wolf_take_home\node_modules\playwright\package.json
+Playwright package version: 1.62.1
+Playwright npm version: 1.62.1
+
+========================================================================
+Playwright Browsers
+========================================================================
+chromium: found C:\Users\zaksk\AppData\Local\ms-playwright\chromium-1234\chrome-win64\chrome.exe
+firefox: found C:\Users\zaksk\AppData\Local\ms-playwright\firefox-1538\firefox\firefox.exe
+webkit: found C:\Users\zaksk\AppData\Local\ms-playwright\webkit-2336\Playwright.exe
+
+========================================================================
+Result
+========================================================================
+Setup log written to: C:\Users\zaksk\Downloads\QA_Wolf_Take_Home(Final)\QA_Wolf_Take_Home(Final)\qa_wolf_take_home\build\2026-08-11\setup.log
+Setup details appended to: C:\Users\zaksk\Downloads\QA_Wolf_Take_Home(Final)\QA_Wolf_Take_Home(Final)\qa_wolf_take_home\build\2026-08-11\output.log
+--- Hacker News Sort Check ---
+Timestamp: 2026-08-11T18:36:22.087Z
+Run date folder: 2026-08-11
+YCombinator test completed:
+Verifying article age is descending: First 100 articles: Descending order is valid
+Table data:+-------+----------------+----------------------------------------------------------------------------------------------------------+--------------------------------+----------------+------------+
+| INDEX | AGETEXT        | TITLETEXT                                                                                                | TITLEDATE                      | MINUTESELAPSED | VALIDORDER |
++-------+----------------+----------------------------------------------------------------------------------------------------------+--------------------------------+----------------+------------+
+| 1     | 3 minutes ago  | Apple Executive in Charge of Pay and Wallet Services Is Leaving (yahoo.com)                              | 2026-08-11T18:33:16 1786473196 | 3              | true       |
+| 2     | 3 minutes ago  | Appetite-suppressing hormone may protect liver from inflammation (medicalxpress.com)                     | 2026-08-11T18:33:08 1786473188 | 3              | true       |
+| 3     | 3 minutes ago  | FieldFleet – self-hostable field operations built with Flutter and Supabase (taskfleetai.github.io)      | 2026-08-11T18:33:07 1786473187 | 3              | true       |
+| 4     | 3 minutes ago  | When's the next model coming out? (modelrumor.com)                                                       | 2026-08-11T18:32:28 1786473148 | 3              | true       |
+| 5     | 5 minutes ago  | URLs aren't strings, and my recent encounter with this (utcc.utoronto.ca)                                | 2026-08-11T18:31:10 1786473070 | 5              | true       |
+| 6     | 5 minutes ago  | Nobody is going to tell you your website is bad (cooked-phi-pink.vercel.app)                             | 2026-08-11T18:31:05 1786473065 | 5              | true       |
+| 7     | 7 minutes ago  | What's the most memory-efficient way to check the weather forecast? (manualdousuario.net)                | 2026-08-11T18:29:03 1786472943 | 7              | true       |
+| 8     | 7 minutes ago  | Show HN: NotebookLM Calibre Plugin (github.com/divyenduz)                                                | 2026-08-11T18:28:30 1786472910 | 7              | true       |
+| 9     | 8 minutes ago  | Declarative Canvas UI for the browser, inspired by Swift (romanuk.org)                                   | 2026-08-11T18:27:42 1786472862 | 8              | true       |
+| 10    | 9 minutes ago  | Vitamin D regulates >5% of the human genome (empirical.health)                                           | 2026-08-11T18:27:16 1786472836 | 9              | true       |
+| 11    | 9 minutes ago  | Three hour notice: congressional report incoming                                                         | 2026-08-11T18:26:35 1786472795 | 9              | true       |
+| 12    | 10 minutes ago | Unsloth Desktop: Open-Source App for Local Models (github.com/unslothai)                                 | 2026-08-11T18:25:50 1786472750 | 10             | true       |
+| 13    | 11 minutes ago | FreeHosts – A community-curated directory of free hosting providers (freehosts.eu)                       | 2026-08-11T18:24:52 1786472692 | 11             | true       |
+| 14    | 11 minutes ago | The Great Copper Crunch: Why the Next Bull Run Is Just Getting Started (prinsights.substack.com)         | 2026-08-11T18:24:24 1786472664 | 11             | true       |
+| 15    | 12 minutes ago | P/ – A simple and clear programming language                                                             | 2026-08-11T18:23:27 1786472607 | 12             | true       |
+| 16    | 13 minutes ago | Ask HN: How much Adderall do you use?                                                                    | 2026-08-11T18:22:36 1786472556 | 13             | true       |
+| 17    | 13 minutes ago | Understanding an AI agent's memory through Harry Potter (squidler.io)                                    | 2026-08-11T18:22:26 1786472546 | 13             | true       |
+| 18    | 14 minutes ago | My home internet died for half a day. So did every agent I had (bostrat.ai)                              | 2026-08-11T18:21:26 1786472486 | 14             | true       |
+| 19    | 16 minutes ago | Fedora CoreOS to Enable Systemd-Oomd and ZRAM Swap by Default (phoronix.com)                             | 2026-08-11T18:20:11 1786472411 | 16             | true       |
+| 20    | 16 minutes ago | Ask HN: When should you open-source your solution and why?                                               | 2026-08-11T18:20:03 1786472403 | 16             | true       |
+| 21    | 16 minutes ago | TDD inside the agent loop – theater or actual value? (martinfowler.com)                                  | 2026-08-11T18:19:51 1786472391 | 16             | true       |
+| 22    | 17 minutes ago | Show HN: HyperSAE – Hyperbolic Sparse Autoencoders for LLM Interpretability (github.com/vishal-dehurdle) | 2026-08-11T18:19:02 1786472342 | 17             | true       |
+| 23    | 17 minutes ago | LTX 2.5 a stronger foundation for what's being built (ltx.io)                                            | 2026-08-11T18:18:43 1786472323 | 17             | true       |
+| 24    | 19 minutes ago | Ask HN: How do you keep 54 LLM workflows on the right models?                                            | 2026-08-11T18:17:16 1786472236 | 19             | true       |
+| 25    | 21 minutes ago | OpenAI's head of ethics leaves startup less than one year after joining (ft.com)                         | 2026-08-11T18:15:03 1786472103 | 21             | true       |
+| 26    | 23 minutes ago | A Preliminary Study on Simultaneous Coscheduling for Discrete GPU vs. Fused GPU (arxiv.org)              | 2026-08-11T18:12:44 1786471964 | 23             | true       |
+| 27    | 23 minutes ago | Show HN: SmokeOps – describe a flow, get checks you rerun without AI (github.com/gate3)                  | 2026-08-11T18:12:40 1786471960 | 23             | true       |
+| 28    | 24 minutes ago | Imprint – Fine-tune MoE LLMs bigger than your RAM (github.com/sigma0101111)                              | 2026-08-11T18:11:52 1786471912 | 24             | true       |
+| 29    | 26 minutes ago | Sam's News – Free AI News Aggregator (samnews.news)                                                      | 2026-08-11T18:10:12 1786471812 | 26             | true       |
+| 30    | 26 minutes ago | We Used to Get Jobs (ironicsans.ghost.io)                                                                | 2026-08-11T18:09:56 1786471796 | 26             | true       |
+| 31    | 26 minutes ago | Nvidia building 1T-parameter Nemotron 4 to rival open AI models (reuters.com)                            | 2026-08-11T18:09:46 1786471786 | 26             | true       |
+| 32    | 27 minutes ago | Cynthion: Open-source USB test instrument (greatscottgadgets.com)                                        | 2026-08-11T18:09:13 1786471753 | 27             | true       |
+| 33    | 28 minutes ago | Elon Musk ran a decoy super PAC to compare Trump with RGB (google.com)                                   | 2026-08-11T18:07:39 1786471659 | 28             | true       |
+| 34    | 29 minutes ago | The worst part of using multiple LLM providers is not the API differences (github.com/maximhq)           | 2026-08-11T18:07:13 1786471633 | 29             | true       |
+| 35    | 29 minutes ago | A bug becoming a feature (1972 edition) (aresluna.org)                                                   | 2026-08-11T18:07:03 1786471623 | 29             | true       |
+| 36    | 29 minutes ago | Ethical Cold Outreach (val.town)                                                                         | 2026-08-11T18:06:55 1786471615 | 29             | true       |
+| 37    | 29 minutes ago | Report from the Security Mines (val.town)                                                                | 2026-08-11T18:06:45 1786471605 | 29             | true       |
+| 38    | 29 minutes ago | Docfooding: Eating Our Own Documentation (val.town)                                                      | 2026-08-11T18:06:34 1786471594 | 29             | true       |
+| 39    | 30 minutes ago | Hack's Law (wikipedia.org)                                                                               | 2026-08-11T18:06:21 1786471581 | 30             | true       |
+| 40    | 31 minutes ago | Would Appreciate Any Feedback (deskfellow.app)                                                           | 2026-08-11T18:04:42 1786471482 | 31             | true       |
+| 41    | 32 minutes ago | ChatGPT Desktop App for Linux (twitter.com/openai)                                                       | 2026-08-11T18:03:56 1786471436 | 32             | true       |
+| 42    | 33 minutes ago | Why Are Rivers So Mathematical? (quantamagazine.org)                                                     | 2026-08-11T18:02:46 1786471366 | 33             | true       |
+| 43    | 33 minutes ago | (2,1)-C1P is NP-complete (zenodo.org)                                                                    | 2026-08-11T18:02:28 1786471348 | 33             | true       |
+| 44    | 34 minutes ago | Inaccessible .bnnsir files on macOS Sequoia (lapcatsoftware.com)                                         | 2026-08-11T18:02:19 1786471339 | 34             | true       |
+| 45    | 34 minutes ago | How to Appreciate (how-to-appreciate.pages.dev)                                                          | 2026-08-11T18:02:14 1786471334 | 34             | true       |
+| 46    | 34 minutes ago | Hetzner: Open Weights Inference API (hetzner.com)                                                        | 2026-08-11T18:02:08 1786471328 | 34             | true       |
+| 47    | 34 minutes ago | FlightAware sues Kalshi over flight cancellation prediction markets [pdf] (courtlistener.com)            | 2026-08-11T18:01:41 1786471301 | 34             | true       |
+| 48    | 34 minutes ago | Shrinking student populations cause spike in public school closures across U.S. (washingtonpost.com)     | 2026-08-11T18:01:29 1786471289 | 34             | true       |
+| 49    | 35 minutes ago | TerminalWidget for Mac, iPhone, and iPad (terminalwidget.app)                                            | 2026-08-11T18:00:31 1786471231 | 35             | true       |
+| 50    | 36 minutes ago | Faceboard: A Case Study in Community-Led Information Exchange (Satire) (mcsweeneys.net)                  | 2026-08-11T17:59:54 1786471194 | 36             | true       |
+| 51    | 37 minutes ago | Proving Muse Glimmer in Zero-Knowledge at 85 Tok/S on an H100 (attestable.com)                           | 2026-08-11T17:58:58 1786471138 | 37             | true       |
+| 52    | 37 minutes ago | Ask HN: Any good alternatives to Claude that are just not Claude?                                        | 2026-08-11T17:58:57 1786471137 | 37             | true       |
+| 53    | 39 minutes ago | Show HN: PR Nutrition, a local rule-based CLI for pull request triage (github.com/param-10)              | 2026-08-11T17:56:38 1786470998 | 39             | true       |
+| 54    | 41 minutes ago | Show HN: TermDOM – HTML, CSS and JavaScript (With a Real DOM) for TUIs and CLIs (github.com/bikeshaving) | 2026-08-11T17:55:20 1786470920 | 41             | true       |
+| 55    | 41 minutes ago | Terminal-Bench 3.0 (frontierbench.ai)                                                                    | 2026-08-11T17:54:54 1786470894 | 41             | true       |
+| 56    | 42 minutes ago | Stateless Servers, Stateful Payloads: Sessions vs. Continuations, Rust (dmitrii.app)                     | 2026-08-11T17:54:20 1786470860 | 42             | true       |
+| 57    | 42 minutes ago | Coma (Continuation Machine) Intermediate Verification Language (paulpatault.fr)                          | 2026-08-11T17:54:03 1786470843 | 42             | true       |
+| 58    | 42 minutes ago | Show HN: Experimentation platform for simulating agents as users (514.ax)                                | 2026-08-11T17:53:53 1786470833 | 42             | true       |
+| 59    | 44 minutes ago | Talking with Synopsys about the Physics of Chip Design at DAC 2026 (chipsandcheese.com)                  | 2026-08-11T17:52:18 1786470738 | 44             | true       |
+| 60    | 44 minutes ago | Ask HN: Ive built and open source P2P chat without back end                                              | 2026-08-11T17:51:49 1786470709 | 44             | true       |
+| 61    | 44 minutes ago | Show HN: Hybrid memory retrieval for coding agents (github.com/yaminbakoh4-dot)                          | 2026-08-11T17:51:35 1786470695 | 44             | true       |
+| 62    | 45 minutes ago | A California Home That Rotates 320 Degrees Takes a Spin on the Market (wsj.com)                          | 2026-08-11T17:51:06 1786470666 | 45             | true       |
+| 63    | 45 minutes ago | AI spend observability down to individual User ID's and routes (kalaa.cc)                                | 2026-08-11T17:50:42 1786470642 | 45             | true       |
+| 64    | 46 minutes ago | OpenSSH 10.5 released, AI assistice now welcome (openssh.org)                                            | 2026-08-11T17:49:37 1786470577 | 46             | true       |
+| 65    | 47 minutes ago | The Pacing of the Frontier (thezvi.substack.com)                                                         | 2026-08-11T17:48:48 1786470528 | 47             | true       |
+| 66    | 47 minutes ago | Show HN: Cjson.cpp, the new fastest-ever (constexpr) JSON parser (github.com/rfgplk)                     | 2026-08-11T17:48:36 1786470516 | 47             | true       |
+| 67    | 48 minutes ago | The Housing Recession Is Over (conorsen.substack.com)                                                    | 2026-08-11T17:48:03 1786470483 | 48             | true       |
+| 68    | 48 minutes ago | Expired DMARC endpoint exposed a NYSE Fortune 1000 infrastructure for $10 (sh.consulting)                | 2026-08-11T17:47:49 1786470469 | 48             | true       |
+| 69    | 48 minutes ago | The Unsloth Desktop App – run and train models locally (unsloth.ai)                                      | 2026-08-11T17:47:44 1786470464 | 48             | true       |
+| 70    | 48 minutes ago | Eight architecture myths BUSTED by Samuel Hughes (bensouthwood.co.uk)                                    | 2026-08-11T17:47:38 1786470458 | 48             | true       |
+| 71    | 49 minutes ago | The SpaceX Sham (dissentmagazine.org)                                                                    | 2026-08-11T17:47:03 1786470423 | 49             | true       |
+| 72    | 50 minutes ago | TRMNL ePaper Design System (github.com/usetrmnl)                                                         | 2026-08-11T17:46:21 1786470381 | 50             | true       |
+| 73    | 51 minutes ago | Remove Claude's Watermark (removeclaudewatermark.org)                                                    | 2026-08-11T17:45:21 1786470321 | 51             | true       |
+| 74    | 51 minutes ago | Up to 12.8x Improvement Observed for Gup_test with New Linux MM Patches (phoronix.com)                   | 2026-08-11T17:45:13 1786470313 | 51             | true       |
+| 75    | 51 minutes ago | Flatpak 1.19 Released with Nine Security Fixes (phoronix.com)                                            | 2026-08-11T17:44:51 1786470291 | 51             | true       |
+| 76    | 51 minutes ago | Analyzing Fedora's Slow Performance on the Framework Laptop 13 Pro (phoronix.com)                        | 2026-08-11T17:44:30 1786470270 | 51             | true       |
+| 77    | 51 minutes ago | Rant/Help Google auto-account bans are insane (accounts.google.com)                                      | 2026-08-11T17:44:25 1786470265 | 51             | true       |
+| 78    | 52 minutes ago | China warns of "security backdoor" in Anthropic AI coding tool [July 8, 2026] (cbsnews.com)              | 2026-08-11T17:43:55 1786470235 | 52             | true       |
+| 79    | 52 minutes ago | Deep-diff NPM JavaScript library lost reference documentation (github.com/therohk)                       | 2026-08-11T17:43:36 1786470216 | 52             | true       |
+| 80    | 53 minutes ago | Ask HN: What are your thoughts on E2E software development using AI agents?                              | 2026-08-11T17:43:11 1786470191 | 53             | true       |
+| 81    | 53 minutes ago | Phone tracking adding to license plate readers, associating devices with cars (techxplore.com)           | 2026-08-11T17:42:39 1786470159 | 53             | true       |
+| 82    | 54 minutes ago | Moving integer division to floating-point is trivial (marc-b-reynolds.github.io)                         | 2026-08-11T17:42:04 1786470124 | 54             | true       |
+| 83    | 54 minutes ago | Experience of Running Muse Glimmer on Mac (holaclaw.ai)                                                  | 2026-08-11T17:42:03 1786470123 | 54             | true       |
+| 84    | 54 minutes ago | Ask HN: Are third party gguf/mmproj safe on Llama in production env                                      | 2026-08-11T17:41:45 1786470105 | 54             | true       |
+| 85    | 55 minutes ago | A compiler that turns a day at my computer into agent memory, no LLM (github.com/nossa-y)                | 2026-08-11T17:41:06 1786470066 | 55             | true       |
+| 86    | 55 minutes ago | Terminal Browser (terminal-browser.com)                                                                  | 2026-08-11T17:40:54 1786470054 | 55             | true       |
+| 87    | 56 minutes ago | Tradecraft: A portable format for context about detections (github.com/spectrum-sec)                     | 2026-08-11T17:40:19 1786470019 | 56             | true       |
+| 88    | 57 minutes ago | Linux desktop use surged to 22% on one workday, Cloudflare data shows (zdnet.com)                        | 2026-08-11T17:39:13 1786469953 | 57             | true       |
+| 89    | 57 minutes ago | Coffee Camp cattle farmer plants 14,000 trees for flood mitigation (abc.net.au)                          | 2026-08-11T17:39:02 1786469942 | 57             | true       |
+| 90    | 58 minutes ago | Possibly Resolving a Conjecture on Matrix Theory with GPT Sol (chillphysicsenjoyer.substack.com)         | 2026-08-11T17:37:29 1786469849 | 58             | true       |
+| 91    | 59 minutes ago | Spotify to Label AI 'Artists' (theguardian.com)                                                          | 2026-08-11T17:36:31 1786469791 | 59             | true       |
+| 92    | 1 hour ago     | Sphere packing, AI, and mathematical beauty (empirical.health)                                           | 2026-08-11T17:36:17 1786469777 | 60             | true       |
+| 93    | 1 hour ago     | Handing Out My Resume in Person (pretendtypewriter.net)                                                  | 2026-08-11T17:34:12 1786469652 | 60             | true       |
+| 94    | 1 hour ago     | Sopcos Protocol Based Liability Attribution in Semi-Autonomous Industrial System (zenodo.org)            | 2026-08-11T17:33:54 1786469634 | 60             | true       |
+| 95    | 1 hour ago     | The Path to Recursive Self-Improving Agents (github.com/d2i-ai)                                          | 2026-08-11T17:33:45 1786469625 | 60             | true       |
+| 96    | 1 hour ago     | July's Heat Dome Put DR on the Front Lines with One of Our Biggest Event Weeks (uplight.com)             | 2026-08-11T17:33:26 1786469606 | 60             | true       |
+| 97    | 1 hour ago     | After the IDE [video] (youtube.com)                                                                      | 2026-08-11T17:32:37 1786469557 | 60             | true       |
+| 98    | 1 hour ago     | Ask HN: What email provider do you recommend for personal email?                                         | 2026-08-11T17:32:32 1786469552 | 60             | true       |
+| 99    | 1 hour ago     | Show HN: Chopi, a macOS filesystem+network sandbox to unleash your agents (github.com/danra)             | 2026-08-11T17:30:46 1786469446 | 60             | true       |
+| 100   | 1 hour ago     | Our puzzle generator lied about difficulty. Twice                                                        | 2026-08-11T17:29:11 1786469351 | 60             | true       |
++-------+----------------+----------------------------------------------------------------------------------------------------------+--------------------------------+----------------+------------+
